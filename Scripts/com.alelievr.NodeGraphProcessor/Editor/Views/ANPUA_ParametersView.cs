@@ -8,7 +8,6 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using System.Linq;
 using System;
-
 namespace GraphProcessor
 {
 
@@ -20,11 +19,21 @@ namespace GraphProcessor
 
         public ANPUA_GenericParameter parameter { get; private set; }
 
-        public ANPUA_GenericParameterFieldView(BaseGraphView graphView, ANPUA_GenericParameter param)
+        public ANPUA_GenericParameterFieldView()
             //: base(null, param.name, param.type.ToString())
-            : base(null, param.name, "")
+            : base()
+        {
+
+        }
+
+        public void initialize(BaseGraphView graphView, ANPUA_GenericParameter param)
         {
             this.graphView = graphView;
+
+            //Setting the BlackboardFields  param.name, param.type.ToString()
+            this.text = param.name;
+            //this.typeText = param.type.ToString();
+
             parameter = param;
             this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
             this.Q("icon").AddToClassList("parameter-" + param.type.ToString());
@@ -60,77 +69,67 @@ namespace GraphProcessor
             parameter = param;
         }
     }
- 
+
+    [Serializable]
     public class SettingsPanel : VisualElement
     {
+        private TextField nameField;
         private Toggle syncStateToggle;
         private Toggle stateToggle;
         private EnumField typeField;
         private IntegerField intField;
         private FloatField floatField;
         private Toggle boolField;
- 
+        private BaseGraphView graphView;
 
-        public SettingsPanel(ANPUA_GenericParameter param, BaseGraphView graphView)
+        public SettingsPanel()
         {
-            style.flexDirection = FlexDirection.Column;
+            // Set up the style and layout for the settings panel
+            style.flexDirection = FlexDirection.Row;
+            style.flexWrap = Wrap.NoWrap;
+            style.justifyContent = Justify.FlexStart; // Align items to the start horizontally
+            style.alignItems = Align.FlexStart; // Align items to the start vertically
             style.marginBottom = 5;
 
-            // Data row containing fields
-            var dataRow = new VisualElement
-            {
-                style = { flexDirection = FlexDirection.Row, justifyContent = Justify.SpaceBetween }
-            };
+            // Add fields to the row container
+            nameField = new TextField("Name");
+            nameField.style.minWidth = 32; // Set minimum width
+            nameField.style.flexGrow = 0; // Prevent stretching
+            Add(nameField);
 
-            var board = new BlackboardRow(new ANPUA_GenericParameterFieldView(graphView, param), new ANPUA_GenericParameterPropertyView(graphView, param))
+            syncStateToggle = new Toggle("Sync State");
+            nameField.style.minWidth = 12;
+            syncStateToggle.style.flexGrow = 0; // Prevent stretching
+            Add(syncStateToggle);
 
-            {
-                style = { flexDirection = FlexDirection.Column, flexGrow = 1 }
-            };
+            stateToggle = new Toggle("State");
+            stateToggle.style.flexGrow = 0; // Prevent stretching
+            Add(stateToggle);
 
-            dataRow.Add(board);
+            typeField = new EnumField("Type");
+            typeField.style.flexGrow = 0; // Prevent stretching
+            Add(typeField);
 
-            typeField = new EnumField(param.type);
-            typeField.RegisterValueChangedCallback(evt => UpdateFieldsVisibility((ANPUA_ParameterType)evt.newValue));
-            dataRow.Add(CreateGridItem(typeField));
+            intField = new IntegerField("Int Value");
+            intField.style.flexGrow = 0; // Prevent stretching
+            Add(intField);
 
-            intField = new IntegerField();
-            dataRow.Add(CreateGridItem(intField));
+            floatField = new FloatField("Float Value");
+            floatField.style.flexGrow = 0; // Prevent stretching
+            Add(floatField);
 
-            floatField = new FloatField();
-            dataRow.Add(CreateGridItem(floatField));
-
-            boolField = new Toggle();
-            dataRow.Add(CreateGridItem(boolField));
-
-            syncStateToggle = new Toggle();
-            dataRow.Add(CreateGridItem(syncStateToggle));
-
-            stateToggle = new Toggle();
-            dataRow.Add(CreateGridItem(stateToggle));
-
-            Add(dataRow);
-
-            UpdateFieldsVisibility(param.type);
-        }
-
-
-
-        private VisualElement CreateGridItem(VisualElement element)
-        {
-            var gridItem = new VisualElement
-            {
-                style = { flexDirection = FlexDirection.Column, flexGrow = 1 }
-            };
-            gridItem.Add(element);
-            return gridItem;
+            boolField = new Toggle("Bool Value");
+            boolField.style.flexGrow = 0; // Prevent stretching
+            Add(boolField);
         }
 
         public void SetParameter(ANPUA_GenericParameter parameter)
         {
+            nameField.value = parameter.name;
             syncStateToggle.value = parameter.syncState == ANPUA_ParameterSyncState.Synch;
             stateToggle.value = parameter.state == ANPUA_ParameterState.Saved;
             typeField.value = parameter.type;
+
             intField.value = parameter.IntValue;
             floatField.value = parameter.FloatValue;
             boolField.value = parameter.BoolValue;
@@ -145,7 +144,7 @@ namespace GraphProcessor
             boolField.style.display = type == ANPUA_ParameterType.Bool ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
-
+   
 
     public class ANPUA_ParametersView : PinnedElementView
     {
@@ -157,13 +156,29 @@ namespace GraphProcessor
 
         List<Rect> blackboardLayouts = new List<Rect>();
 
-
+        private MultiColumnListView multiColumnListView;
 
         public ANPUA_ParametersView()
         {
             var style = Resources.Load<StyleSheet>(exposedParameterViewStyle);
             if (style != null)
                 styleSheets.Add(style);
+
+
+        }
+
+        public void createList()
+        {
+
+            content.Clear();
+
+            // Create a MultiColumnListView
+            multiColumnListView = new MultiColumnListView();
+            multiColumnListView.style.flexGrow = 2;
+            multiColumnListView.selectionType = SelectionType.None;
+            multiColumnListView.virtualizationMethod =CollectionVirtualizationMethod.DynamicHeight;
+            // Add the MultiColumnListView to the content container
+            content.Add(multiColumnListView);
         }
 
         protected virtual void OnAddClicked()
@@ -190,7 +205,11 @@ namespace GraphProcessor
             }
 
             parameterType.ShowAsContext();
+            //Update
+            UpdateParameterList();
         }
+
+
 
         protected string GetNiceNameFromType(Type type)
         {
@@ -221,39 +240,113 @@ namespace GraphProcessor
             };
         }
 
+
+
         protected virtual void UpdateParameterList()
         {
-            content.Clear();
 
+            // Clear the list
+            createList();
 
-            content.style.display = DisplayStyle.Flex;
-            content.style.flexDirection = FlexDirection.Column;
-            content.style.flexWrap = Wrap.NoWrap;
-            content.style.justifyContent = Justify.FlexStart;
-            //mainGridContainer.style.alignItems = Align.Stretch;
-
-
-            // Header row with labels
-            var headerRow = new VisualElement
+            // Define the columns
+            multiColumnListView.columns.Add(new Column
             {
-                style = { flexDirection = FlexDirection.Row, justifyContent = Justify.SpaceBetween }
-            };
+                title = "Name",
+                makeCell = () => new ANPUA_GenericParameterFieldView(),
+                bindCell = (element, i) =>
+                {
+                    var parameterField = element as ANPUA_GenericParameterFieldView;
+                    var parameter = graphView.graph.parameters[i] as ANPUA_GenericParameter;
+                    parameterField.initialize(graphView, parameter);
+                },
+                minWidth = 120,
 
-            headerRow.Add(CreateHeaderLabel("Name"));
-            headerRow.Add(CreateHeaderLabel("Type"));
-            headerRow.Add(CreateHeaderLabel("Value"));
-            headerRow.Add(CreateHeaderLabel("Sync"));
-            headerRow.Add(CreateHeaderLabel("Save")); 
+            });
 
-            content.Add(headerRow);
-
-            foreach (var param in graphView.graph.parameters)
+            multiColumnListView.columns.Add(new Column
             {
-                //Create Visual Children for each parameter
-                var settingsPanel = new SettingsPanel(param, graphView);
-                content.Add(settingsPanel);
-            }
+                title = "Sync",
+                makeCell = () => new Toggle(),
+                bindCell = (element, i) =>
+                {
+                    var toggle = element as Toggle;
+                    var parameter = graphView.graph.parameters[i] as ANPUA_GenericParameter;
+                    toggle.value = parameter.syncState == ANPUA_ParameterSyncState.Synch;
+                    toggle.RegisterValueChangedCallback(evt => parameter.syncState = evt.newValue ? ANPUA_ParameterSyncState.Synch : ANPUA_ParameterSyncState.Unsynch);
+                },
+                width = 40
+            });
 
+            multiColumnListView.columns.Add(new Column
+            {
+                title = "Save",
+                makeCell = () => new Toggle(),
+                bindCell = (element, i) =>
+                {
+                    var toggle = element as Toggle;
+                    var parameter = graphView.graph.parameters[i] as ANPUA_GenericParameter;
+                    toggle.value = parameter.state == ANPUA_ParameterState.Saved;
+                    toggle.RegisterValueChangedCallback(evt => parameter.state = evt.newValue ? ANPUA_ParameterState.Saved : ANPUA_ParameterState.Unsaved);
+                },
+                width = 40
+            });
+
+            multiColumnListView.columns.Add(new Column
+            {
+                title = "Type",
+                makeCell = () => new EnumField(ANPUA_ParameterType.Int),
+                bindCell = (element, i) =>
+                {
+                    var enumField = element as EnumField;
+                    var parameter = graphView.graph.parameters[i] as ANPUA_GenericParameter;
+                    enumField.value = parameter.type;
+                    enumField.RegisterValueChangedCallback(evt => parameter.type = (ANPUA_ParameterType)evt.newValue);
+                },
+                //Flex Grow
+                width = 50,
+
+
+
+            });
+
+
+            multiColumnListView.columns.Add(new Column
+            {
+                title = "Value",
+                makeCell = () => new VisualElement(),
+                bindCell = (element, i) =>
+                {
+                    var parameter = graphView.graph.parameters[i] as ANPUA_GenericParameter;
+                    var container = element as VisualElement;
+                    container.Clear();
+
+                    switch (parameter.type)
+                    {
+                        case ANPUA_ParameterType.Int:
+                            var intField = new IntegerField();
+                            intField.value = parameter.IntValue;
+                            intField.RegisterValueChangedCallback(evt => parameter.IntValue = evt.newValue);
+                            container.Add(intField);
+                            break;
+                        case ANPUA_ParameterType.Float:
+                            var floatField = new FloatField();
+                            floatField.value = parameter.FloatValue;
+                            floatField.RegisterValueChangedCallback(evt => parameter.FloatValue = evt.newValue);
+                            container.Add(floatField);
+                            break;
+                        case ANPUA_ParameterType.Bool:
+                            var boolField = new Toggle();
+                            boolField.value = parameter.BoolValue;
+                            boolField.RegisterValueChangedCallback(evt => parameter.BoolValue = evt.newValue);
+                            container.Add(boolField);
+                            break;
+                    }
+                },
+                width = 70
+            });
+
+            multiColumnListView.itemsSource = graphView.graph.parameters;
+            multiColumnListView.Rebuild();
         }
         protected override void Initialize(BaseGraphView graphView)
         {
@@ -270,22 +363,21 @@ namespace GraphProcessor
             RegisterCallback<MouseDownEvent>(OnMouseDownEvent, TrickleDown.TrickleDown);
             RegisterCallback<DetachFromPanelEvent>(OnViewClosed);
 
-            UpdateParameterList();
-
             // Add exposed parameter button
             header.Add(new Button(OnAddClicked)
             {
                 text = "+"
             });
+
+            UpdateParameterList();
         }
 
-        void OnViewClosed(DetachFromPanelEvent evt)
-            => Undo.undoRedoPerformed -= UpdateParameterList;
 
         void OnMouseDownEvent(MouseDownEvent evt)
         {
             blackboardLayouts = content.Children().Select(c => c.layout).ToList();
         }
+
 
         int GetInsertIndexFromMousePosition(Vector2 pos)
         {
@@ -307,6 +399,7 @@ namespace GraphProcessor
             return content.childCount;
         }
 
+
         void OnDragUpdatedEvent(DragUpdatedEvent evt)
         {
             DragAndDrop.visualMode = DragAndDropVisualMode.Move;
@@ -316,29 +409,11 @@ namespace GraphProcessor
             if (graphSelectionDragData == null)
                 return;
 
-            // foreach (var obj in graphSelectionDragData as List<ISelectable>)
-            // {
-            //     if (obj is ANPUA_GenericParameterFieldView view)
-            //     {
-            //         var blackBoardRow = view.parent.parent.parent.parent.parent.parent;
-            //         int oldIndex = content.Children().ToList().FindIndex(c => c == blackBoardRow);
-            //         // Try to find the blackboard row
-            //         content.Remove(blackBoardRow);
-
-            //         if (newIndex > oldIndex)
-            //             newIndex--;
-
-            //         content.Insert(newIndex, blackBoardRow);
-            //     }
-            // }
-
-
-            //Changed to use the SettingsPanel
             foreach (var obj in graphSelectionDragData as List<ISelectable>)
             {
-                if (obj is SettingsPanel view)
+                if (obj is ANPUA_GenericParameterFieldView view)
                 {
-                    var blackBoardRow = view.parent;
+                    var blackBoardRow = view.parent.parent.parent.parent.parent.parent;
                     int oldIndex = content.Children().ToList().FindIndex(c => c == blackBoardRow);
                     // Try to find the blackboard row
                     content.Remove(blackBoardRow);
@@ -355,33 +430,64 @@ namespace GraphProcessor
         {
             bool updateList = false;
 
-            // int newIndex = GetInsertIndexFromMousePosition(evt.mousePosition);
-            // foreach (var obj in DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>)
-            // {
-            //     if (obj is ExposedParameterFieldView view)
-            //     {
-            //         if (!updateList)
-            //             graphView.RegisterCompleteObjectUndo("Moved parameters");
+            int newIndex = GetInsertIndexFromMousePosition(evt.mousePosition);
+            foreach (var obj in DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>)
+            {
+                if (obj is ANPUA_GenericParameterFieldView view)
+                {
+                    if (!updateList)
+                        graphView.RegisterCompleteObjectUndo("Moved parameters");
 
-            //         int oldIndex = graphView.graph.parameters.FindIndex(e => e == view.parameter);
-            //         var parameter = graphView.graph.parameters[oldIndex];
-            //         graphView.graph.parameters.RemoveAt(oldIndex);
+                    int oldIndex = graphView.graph.parameters.FindIndex(e => e == view.parameter);
+                    var parameter = graphView.graph.parameters[oldIndex];
+                    graphView.graph.parameters.RemoveAt(oldIndex);
 
-            //         // Patch new index after the remove operation:
-            //         if (newIndex > oldIndex)
-            //             newIndex--;
+                    // Patch new index after the remove operation:
+                    if (newIndex > oldIndex)
+                        newIndex--;
 
-            //         graphView.graph.parameters.Insert(newIndex, parameter);
+                    graphView.graph.parameters.Insert(newIndex, parameter);
 
-            //         updateList = true;
-            //     }
-            // }
+                    updateList = true;
+                }
+            }
 
-            // if (updateList)
-            // {
-            //     evt.StopImmediatePropagation();
-            //     UpdateParameterList();
-            // }
+            if (updateList)
+            {
+                evt.StopImmediatePropagation();
+                UpdateParameterList();
+            }
         }
+
+
+        void OnMouseDown(MouseDownEvent evt)
+        {
+            DragAndDrop.PrepareStartDrag();
+            DragAndDrop.objectReferences = new UnityEngine.Object[] { evt.target as UnityEngine.Object };
+            DragAndDrop.StartDrag("Dragging BlackboardField");
+            evt.StopPropagation();
+        }
+
+        void OnMouseMove(MouseMoveEvent evt)
+        {
+            if (DragAndDrop.objectReferences.Length > 0)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+                evt.StopPropagation();
+            }
+        }
+
+        void OnMouseUp(MouseUpEvent evt)
+        {
+            DragAndDrop.AcceptDrag();
+            evt.StopPropagation();
+        }
+
+        void OnViewClosed(DetachFromPanelEvent evt)
+        {
+            Undo.undoRedoPerformed -= UpdateParameterList;
+        }
+
+
     }
 }

@@ -11,20 +11,29 @@ namespace GraphProcessor
         //Public variable of both Enum
 
         //guid
-        public string guid=System.Guid.NewGuid().ToString();
-        public string name="New Parameter";
+        public string guid = System.Guid.NewGuid().ToString();
+        [SerializeField]
+        public string name = "New Parameter";
+        [SerializeField]
+        public ANPUA_ParameterSyncState syncState = ANPUA_ParameterSyncState.Unsynch;
+        [SerializeField]
+        public ANPUA_ParameterState state = ANPUA_ParameterState.Unsaved;
+        [SerializeField]
+        public ANPUA_ParameterType type = ANPUA_ParameterType.Int;
 
-        public ANPUA_ParameterSyncState syncState=ANPUA_ParameterSyncState.Unsynch;
-        public ANPUA_ParameterState state=ANPUA_ParameterState.Unsaved;
-        public ANPUA_ParameterType type=ANPUA_ParameterType.Int;
-        
 
         //Create a getter and setter based on the Type
+        [SerializeField]
         public int IntValue
         {
+
             get
             {
-                return (int)value;
+                if (value is int intValue)
+                {
+                    return intValue;
+                }
+                return 0;
             }
             set
             {
@@ -32,11 +41,16 @@ namespace GraphProcessor
             }
         }
 
+        [SerializeField]
         public float FloatValue
         {
             get
-            {
-                return (float)value;
+            { 
+                if (value is float floatValue)
+                {
+                    return floatValue;
+                }
+                return 0;
             }
             set
             {
@@ -44,11 +58,16 @@ namespace GraphProcessor
             }
         }
 
+        [SerializeField]
         public bool BoolValue
         {
             get
             {
-                return (bool)value;
+                if (value is bool boolValue)
+                {
+                    return boolValue;
+                }
+                return false;
             }
             set
             {
