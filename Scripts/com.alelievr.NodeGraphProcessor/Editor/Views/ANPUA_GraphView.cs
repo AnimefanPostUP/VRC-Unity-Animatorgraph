@@ -11,7 +11,14 @@ namespace GraphProcessor
     public class ANPUA_GraphView : BaseGraphView
     {
         // Nothing special to add for now
-        public ANPUA_GraphView(EditorWindow window) : base(window) { }
+        public ANPUA_GraphView(EditorWindow window) : base(window)
+        {
+
+            RegisterCallback<DragUpdatedEvent>(OnDragUpdatedEvent);
+            RegisterCallback<DragPerformEvent>(OnDragPerformEvent);
+
+
+        }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
@@ -30,7 +37,7 @@ namespace GraphProcessor
         }
 
 
-                //Function for drag and Drop
+        //Function for drag and Drop
         protected void OnDropObjects(UnityEngine.Object[] objects)
         {
             Debug.Log("Dropped objects");
@@ -45,5 +52,31 @@ namespace GraphProcessor
                 }
             }
         }
+
+        private void OnDragUpdatedEvent(DragUpdatedEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                evt.StopPropagation();
+            }
+        }
+
+        private void OnDragPerformEvent(DragPerformEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                var nodeType = DragAndDrop.GetGenericData("NodeType") as Type;
+                var mousePosition = evt.mousePosition;
+                var graphPosition = contentViewContainer.WorldToLocal(mousePosition);
+
+                // Create the node at the drop position
+                AddNode(BaseNode.CreateFromType(nodeType, graphPosition));
+
+                DragAndDrop.AcceptDrag();
+                DragAndDrop.SetGenericData("NodeType", null);
+                evt.StopPropagation();
+            }
+        }
     }
-} 
+}
