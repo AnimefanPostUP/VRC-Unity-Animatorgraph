@@ -12,6 +12,49 @@ using System.Linq;
 namespace GraphProcessor
 {
 
+	//Draggable Label to create Nodes using Add
+
+	public class DraggableLabel : Label
+	{
+		private Type nodeType;
+
+		public DraggableLabel(string text, Type nodeType) : base(text)
+		{
+			this.nodeType = nodeType;
+			RegisterCallback<MouseDownEvent>(OnMouseDown);
+			RegisterCallback<MouseMoveEvent>(OnMouseMove);
+			RegisterCallback<MouseUpEvent>(OnMouseUp);
+		}
+
+		private void OnMouseDown(MouseDownEvent evt)
+		{
+			DragAndDrop.PrepareStartDrag();
+			DragAndDrop.SetGenericData("NodeType", nodeType);
+			DragAndDrop.StartDrag("Dragging Node");
+			evt.StopPropagation();
+		}
+
+		private void OnMouseMove(MouseMoveEvent evt)
+		{
+			if (DragAndDrop.GetGenericData("NodeType") != null)
+			{
+				DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+				evt.StopPropagation();
+			}
+		}
+
+		private void OnMouseUp(MouseUpEvent evt)
+		{
+			if (DragAndDrop.GetGenericData("NodeType") != null)
+			{
+				DragAndDrop.AcceptDrag();
+				DragAndDrop.SetGenericData("NodeType", null);
+				evt.StopPropagation();
+			}
+		}
+	}
+
+
 
 	public class ANPUA_NodePanelView : PinnedElementView
 	{
@@ -36,6 +79,9 @@ namespace GraphProcessor
 		{
 			title = "NodePanel";
 			scrollable = true;
+
+			//Drag events
+
 		}
 
 		protected override void Initialize(BaseGraphView graphView)
@@ -64,7 +110,13 @@ namespace GraphProcessor
 
 			LoadNodes();
 			GenerateUI();
-			//Create a Grid with the nodes
+
+
+			//Callbacks
+			RegisterCallback<DragUpdatedEvent>(OnDragUpdatedEvent);
+			RegisterCallback<DragPerformEvent>(OnDragPerformEvent);
+
+
 
 		}
 
@@ -128,11 +180,11 @@ namespace GraphProcessor
 					string[] parts = path.Split('/');
 					string name = parts[parts.Length - 1];
 
-			
-					Label nodeButton;
+
+					DraggableLabel nodeButton;
 					if (showNames)
 					{
-						nodeButton = new Label()
+						nodeButton = new DraggableLabel("", node.Item2)
 						{
 							text = name,
 							tooltip = name,
@@ -148,9 +200,8 @@ namespace GraphProcessor
 					}
 					else
 					{
-						nodeButton = new Label()
+						nodeButton = new DraggableLabel("", node.Item2)
 						{
-							text = "",
 							tooltip = name,
 
 
@@ -308,5 +359,34 @@ namespace GraphProcessor
 			GenerateUI();
 
 		}
+
+        // Callbacks
+        private void OnDragUpdatedEvent(DragUpdatedEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                evt.StopPropagation();
+            }
+        }
+
+        private void OnDragPerformEvent(DragPerformEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                var nodeType = DragAndDrop.GetGenericData("NodeType") as Type;
+                var mousePosition = evt.mousePosition;
+                var graphPosition = graphView.contentViewContainer.WorldToLocal(mousePosition);
+
+                // Create the node at the drop position
+                graphView.AddNode(BaseNode.CreateFromType(nodeType, graphPosition));
+
+                DragAndDrop.AcceptDrag();
+                DragAndDrop.SetGenericData("NodeType", null);
+                evt.StopPropagation();
+            }
+        }
+
+
 	}
 }

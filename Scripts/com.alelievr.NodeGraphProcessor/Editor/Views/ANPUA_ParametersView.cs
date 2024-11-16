@@ -19,6 +19,7 @@ namespace GraphProcessor
 
         public ANPUA_GenericParameter parameter { get; private set; }
 
+        private Type nodeType;
         public ANPUA_GenericParameterFieldView()
             //: base(null, param.name, param.type.ToString())
             : base()
@@ -45,6 +46,109 @@ namespace GraphProcessor
                 text = e.newValue;
                 graphView.graph.UpdateParameterName(param, e.newValue);
             });
+
+            //set type based on parameter type
+            switch (param.type)
+            {
+                case ANPUA_ParameterType.Int:
+                    nodeType = typeof(ANPUA_Parameter_Int);
+                    break;
+                case ANPUA_ParameterType.Float:
+                    nodeType = typeof(ANPUA_Parameter_Float);
+                    break;
+                case ANPUA_ParameterType.Bool:
+                    nodeType = typeof(ANPUA_Parameter_Bool);
+                    break;
+            }
+
+            RegisterCallback<MouseDownEvent>(OnMouseDown);
+            RegisterCallback<MouseMoveEvent>(OnMouseMove);
+            RegisterCallback<MouseUpEvent>(OnMouseUp);
+
+            RegisterCallback<DragUpdatedEvent>(OnDragUpdatedEvent);
+            RegisterCallback<DragPerformEvent>(OnDragPerformEvent);
+
+
+        }
+
+        private void OnDragUpdatedEvent(DragUpdatedEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                evt.StopPropagation();
+            }
+        }
+  
+        private void OnDragPerformEvent(DragPerformEvent evt)
+        {
+            //if (graphView.contentViewContainer.ContainsPoint(graphView.contentViewContainer.WorldToLocal(evt.mousePosition)))
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+
+                //Make sure we are above the graphView
+
+
+                var nodeType = DragAndDrop.GetGenericData("NodeType") as Type;
+                var mousePosition = evt.mousePosition;
+                var graphPosition = graphView.contentViewContainer.WorldToLocal(mousePosition);
+
+                // Create the node at the drop position
+                var newnode = BaseNode.CreateFromType(nodeType, graphPosition);
+
+                //if ANPUA_Parameter_Bool
+                if (newnode is ANPUA_Parameter_Bool boolNode)
+                {
+                    boolNode.parameter = parameter;
+                }
+
+                //if ANPUA_Parameter_Float
+                if (newnode is ANPUA_Parameter_Float floatNode)
+                {
+                    floatNode.parameter = parameter;
+                }
+
+                //if ANPUA_Parameter_Int
+                if (newnode is ANPUA_Parameter_Int intNode)
+                {
+                    intNode.parameter = parameter;
+                }
+
+
+
+                graphView.AddNode(newnode);
+
+                DragAndDrop.AcceptDrag();
+                DragAndDrop.SetGenericData("NodeType", null);
+                evt.StopPropagation();
+            }
+        }
+
+        private void OnMouseDown(MouseDownEvent evt)
+        {
+            DragAndDrop.PrepareStartDrag();
+            DragAndDrop.SetGenericData("NodeType", nodeType);
+            DragAndDrop.StartDrag("Dragging Node");
+            evt.StopPropagation();
+        }
+
+        private void OnMouseMove(MouseMoveEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                evt.StopPropagation();
+            }
+        }
+
+        private void OnMouseUp(MouseUpEvent evt)
+        {
+            if (DragAndDrop.GetGenericData("NodeType") != null)
+            {
+                DragAndDrop.AcceptDrag();
+                DragAndDrop.SetGenericData("NodeType", null);
+                evt.StopPropagation();
+            }
         }
 
         void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -144,7 +248,7 @@ namespace GraphProcessor
             boolField.style.display = type == ANPUA_ParameterType.Bool ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
-   
+
 
     public class ANPUA_ParametersView : PinnedElementView
     {
@@ -176,7 +280,7 @@ namespace GraphProcessor
             multiColumnListView = new MultiColumnListView();
             multiColumnListView.style.flexGrow = 2;
             multiColumnListView.selectionType = SelectionType.None;
-            multiColumnListView.virtualizationMethod =CollectionVirtualizationMethod.DynamicHeight;
+            multiColumnListView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
             // Add the MultiColumnListView to the content container
             content.Add(multiColumnListView);
         }
@@ -358,9 +462,8 @@ namespace GraphProcessor
             graphView.initialized += UpdateParameterList;
             Undo.undoRedoPerformed += UpdateParameterList;
 
-            RegisterCallback<DragUpdatedEvent>(OnDragUpdatedEvent);
-            RegisterCallback<DragPerformEvent>(OnDragPerformEvent);
-            RegisterCallback<MouseDownEvent>(OnMouseDownEvent, TrickleDown.TrickleDown);
+
+            //RegisterCallback<MouseDownEvent>(OnMouseDownEvent, TrickleDown.TrickleDown);
             RegisterCallback<DetachFromPanelEvent>(OnViewClosed);
 
             // Add exposed parameter button
@@ -373,10 +476,10 @@ namespace GraphProcessor
         }
 
 
-        void OnMouseDownEvent(MouseDownEvent evt)
-        {
-            blackboardLayouts = content.Children().Select(c => c.layout).ToList();
-        }
+        // void OnMouseDownEvent(MouseDownEvent evt)
+        // {
+        //     blackboardLayouts = content.Children().Select(c => c.layout).ToList();
+        // }
 
 
         int GetInsertIndexFromMousePosition(Vector2 pos)
@@ -400,88 +503,90 @@ namespace GraphProcessor
         }
 
 
-        void OnDragUpdatedEvent(DragUpdatedEvent evt)
-        {
-            DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-            int newIndex = GetInsertIndexFromMousePosition(evt.mousePosition);
-            var graphSelectionDragData = DragAndDrop.GetGenericData("DragSelection");
+        // void OnDragUpdatedEvent(DragUpdatedEvent evt)
+        // {
+        //     DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+        //     int newIndex = GetInsertIndexFromMousePosition(evt.mousePosition);
+        //     var graphSelectionDragData = DragAndDrop.GetGenericData("DragSelection");
 
-            if (graphSelectionDragData == null)
-                return;
+        //     if (graphSelectionDragData == null)
+        //         return;
 
-            foreach (var obj in graphSelectionDragData as List<ISelectable>)
-            {
-                if (obj is ANPUA_GenericParameterFieldView view)
-                {
-                    var blackBoardRow = view.parent.parent.parent.parent.parent.parent;
-                    int oldIndex = content.Children().ToList().FindIndex(c => c == blackBoardRow);
-                    // Try to find the blackboard row
-                    content.Remove(blackBoardRow);
+        //     foreach (var obj in graphSelectionDragData as List<ISelectable>)
+        //     {
+        //         if (obj is ANPUA_GenericParameterFieldView view)
+        //         {
+        //             var blackBoardRow = view.parent.parent.parent.parent.parent.parent;
+        //             int oldIndex = content.Children().ToList().FindIndex(c => c == blackBoardRow);
+        //             // Try to find the blackboard row
+        //             content.Remove(blackBoardRow);
 
-                    if (newIndex > oldIndex)
-                        newIndex--;
+        //             if (newIndex > oldIndex)
+        //                 newIndex--;
 
-                    content.Insert(newIndex, blackBoardRow);
-                }
-            }
-        }
+        //             content.Insert(newIndex, blackBoardRow);
+        //         }
+        //     }
+        // }
 
-        void OnDragPerformEvent(DragPerformEvent evt)
-        {
-            bool updateList = false;
+        // void OnDragPerformEvent(DragPerformEvent evt)
+        // {
+        //     bool updateList = false;
 
-            int newIndex = GetInsertIndexFromMousePosition(evt.mousePosition);
-            foreach (var obj in DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>)
-            {
-                if (obj is ANPUA_GenericParameterFieldView view)
-                {
-                    if (!updateList)
-                        graphView.RegisterCompleteObjectUndo("Moved parameters");
+        //     int newIndex = GetInsertIndexFromMousePosition(evt.mousePosition);
+        //     foreach (var obj in DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>)
+        //     {
+        //         if (obj is ANPUA_GenericParameterFieldView view)
+        //         {
+        //             if (!updateList)
+        //                 graphView.RegisterCompleteObjectUndo("Moved parameters");
 
-                    int oldIndex = graphView.graph.parameters.FindIndex(e => e == view.parameter);
-                    var parameter = graphView.graph.parameters[oldIndex];
-                    graphView.graph.parameters.RemoveAt(oldIndex);
+        //             int oldIndex = graphView.graph.parameters.FindIndex(e => e == view.parameter);
+        //             var parameter = graphView.graph.parameters[oldIndex];
+        //             graphView.graph.parameters.RemoveAt(oldIndex);
 
-                    // Patch new index after the remove operation:
-                    if (newIndex > oldIndex)
-                        newIndex--;
+        //             // Patch new index after the remove operation:
+        //             if (newIndex > oldIndex)
+        //                 newIndex--;
 
-                    graphView.graph.parameters.Insert(newIndex, parameter);
+        //             graphView.graph.parameters.Insert(newIndex, parameter);
 
-                    updateList = true;
-                }
-            }
+        //             updateList = true;
+        //         }
+        //     }
 
-            if (updateList)
-            {
-                evt.StopImmediatePropagation();
-                UpdateParameterList();
-            }
-        }
+        //     if (updateList)
+        //     {
+        //         evt.StopImmediatePropagation();
+        //         UpdateParameterList();
+        //     }
+        // }
 
 
-        void OnMouseDown(MouseDownEvent evt)
-        {
-            DragAndDrop.PrepareStartDrag();
-            DragAndDrop.objectReferences = new UnityEngine.Object[] { evt.target as UnityEngine.Object };
-            DragAndDrop.StartDrag("Dragging BlackboardField");
-            evt.StopPropagation();
-        }
+        // void OnMouseDown(MouseDownEvent evt)
+        // {
+        //     DragAndDrop.PrepareStartDrag();
+        //     DragAndDrop.objectReferences = new UnityEngine.Object[] { evt.target as UnityEngine.Object };
+        //     DragAndDrop.StartDrag("Dragging BlackboardField");
+        //     evt.StopPropagation();
+        // }
 
-        void OnMouseMove(MouseMoveEvent evt)
-        {
-            if (DragAndDrop.objectReferences.Length > 0)
-            {
-                DragAndDrop.visualMode = DragAndDropVisualMode.Move;
-                evt.StopPropagation();
-            }
-        }
+        // void OnMouseMove(MouseMoveEvent evt)
+        // {
+        //     if (DragAndDrop.objectReferences.Length > 0)
+        //     {
+        //         DragAndDrop.visualMode = DragAndDropVisualMode.Move;
+        //         evt.StopPropagation();
+        //     }
+        // }
 
-        void OnMouseUp(MouseUpEvent evt)
-        {
-            DragAndDrop.AcceptDrag();
-            evt.StopPropagation();
-        }
+        // void OnMouseUp(MouseUpEvent evt)
+        // {
+        //     DragAndDrop.AcceptDrag();
+        //     evt.StopPropagation();
+        // }
+
+
 
         void OnViewClosed(DetachFromPanelEvent evt)
         {
