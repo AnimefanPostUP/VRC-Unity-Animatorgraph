@@ -25,7 +25,7 @@ namespace GraphProcessor
 
 
         [Input(name = "Parameter", allowMultiple = false)]
-        public ANPUA_NodeLink_Parameter link_Parameter;
+        public ANPUA_NodeLink_Parameter link_IN_Parameter;
 
         //menu out
         [Vertical]
@@ -49,7 +49,10 @@ namespace GraphProcessor
             // Return all the nodes connected to the executes port
             return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
         }
-
+        public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
+        {
+            return node.GetOutputNodes();
+        }
         public override FieldInfo[] GetNodeFields() => base.GetNodeFields();
     }
 }

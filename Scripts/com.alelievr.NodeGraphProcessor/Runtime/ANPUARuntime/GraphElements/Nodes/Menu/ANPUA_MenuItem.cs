@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace GraphProcessor
 {
-    [System.Serializable, NodeMenuItem("Menu Elements/Menu")]
-    public class ANPUA_Menu : BaseNode, ANPUA_INode
+    [System.Serializable]
+    public class ANPUA_MenuItem : BaseNode, ANPUA_INode
     {
-        public override string name => "Menu";
+        public override string name => "MenuItem";
 
         //[Input(name = "Title", allowMultiple = false), SerializeField]
         public string menuname;
@@ -37,10 +37,7 @@ namespace GraphProcessor
             return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
         }
 
-        public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
-        {
-            return node.GetOutputNodes();
-        }
+
         protected override void Process()
         {
             base.Process();

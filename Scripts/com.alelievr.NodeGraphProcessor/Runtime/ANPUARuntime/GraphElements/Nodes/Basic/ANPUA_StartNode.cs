@@ -32,7 +32,10 @@ namespace GraphProcessor
 			// Return all the nodes connected to the executes port
 			return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
 		}
-
+        public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
+        {
+            return node.GetOutputNodes();
+        }
 		public override FieldInfo[] GetNodeFields() => base.GetNodeFields();
 	}
 }
