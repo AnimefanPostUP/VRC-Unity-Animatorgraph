@@ -5,12 +5,13 @@ using System.Linq;
 using System.Reflection;
 using GraphProcessor;
 using UnityEngine;
-
+using MA_Wrapper = GraphProcessor.ANPUA_ModularAvatar_Wrapper;
+using nadena.dev.modular_avatar.core;
 
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Menu")]
-    public class ANPUA_Menu : BaseNode, ANPUA_INode
+    public class ANPUA_Menu : ANPUA_BaseNode_Menu, ANPUA_INode
     {
         public override string name => "Menu";
 
@@ -20,16 +21,20 @@ namespace GraphProcessor
         //[Input(name = "Icon", allowMultiple = false), SerializeField]
         public Texture2D icon;
 
+        //ProcessMenuNode
 
+        public override void ProcessMenuNode()
+        {
+            ANPUA_BaseNode_Menu inputnode=GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as ANPUA_BaseNode_Menu;
+            ANPUA_Container_Menu inputMenuContainer = inputnode.menuContainer;
 
-        [Input, Vertical]
-        public ANPUA_NodeLink_Menu link_IN;
+            GameObject newMenuObject;
+            ModularAvatarMenuItem newMenuItem;
 
-        [Output, Vertical] 
-        public IEnumerable<ANPUA_NodeLink_Menu> link_OUT;
-
-
-
+            (newMenuObject, newMenuItem)= MA_Wrapper.createSubMenu (inputMenuContainer.maS, inputMenuContainer.menuObject, menuname, icon);
+            menuContainer=new ANPUA_Container_Menu( inputMenuContainer.maS, newMenuObject, newMenuItem);
+        }
+        
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
@@ -44,27 +49,9 @@ namespace GraphProcessor
         protected override void Process()
         {
             base.Process();
-            // link_OUT =  new ANPUA_NodeLink_Menu();
-
-            // if (link_OUT == null)
-            //     return;
-
-            // foreach (float input in inputs)
-            //     output += input;
         }
 
-        [CustomPortBehavior(nameof(link_OUT))]
-        IEnumerable<PortData> GetPortsForOutputs(List<SerializableEdge> edges)
-        {
-            yield return new PortData { displayName = "Menu ", displayType = typeof(ANPUA_NodeLink_Menu), acceptMultipleEdges = true };
-        }
 
-        [CustomPortOutput(nameof(link_OUT), typeof(ANPUA_NodeLink_Menu), allowCast = true)]
-        public void GetOutputs(List<SerializableEdge> edges)
-        {
-            link_OUT = edges.Select(e => (ANPUA_NodeLink_Menu)e.passThroughBuffer);
-        }
- 
         public override FieldInfo[] GetNodeFields() => base.GetNodeFields();
 
 

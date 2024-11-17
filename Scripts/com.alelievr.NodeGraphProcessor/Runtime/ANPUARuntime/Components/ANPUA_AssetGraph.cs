@@ -16,6 +16,7 @@ using UnityEngine.UI;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
+using MA_Wrapper = GraphProcessor.ANPUA_ModularAvatar_Wrapper;
 
 
 [assembly: ExportsPlugin(typeof(ANPUA_AssetGraphProcessor))]
@@ -139,7 +140,7 @@ namespace GraphProcessor
         private void GenerateMenu(BaseGraph graph, GameObject target, MaAc modularAvatar, ANPUA_StartNode descriptor)
         {
             //Create the Menu
-            GameObject menuObject = createSubMenu(modularAvatar, target, descriptor.name, null);
+            GameObject menuObject = MA_Wrapper.createSubMenu(modularAvatar, target, descriptor.name, null);
 
             //get the Connected Nodes using the GetConnectedNodes Function
             var connectedNodes = descriptor.GetPort(nameof(ANPUA_StartNode.link_OUT_Menu), null).GetEdges().Select(e => e.inputNode).ToList();
@@ -180,8 +181,8 @@ namespace GraphProcessor
             if (node is ANPUA_Menu)
             {
                 ANPUA_Menu menu = node as ANPUA_Menu;
-                menuObject = createSubMenu(modularAvatar, menuObject, menu.name, null);
-                IterateNodes(menu.GetPort(nameof(ANPUA_Menu.link_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                //menuObject = createSubMenu(modularAvatar, menuObject, menu.name, null);
+                IterateNodes(menu.GetPort(nameof(ANPUA_Menu.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
             }
             else if (node is ANPUA_Menu_Toggle)
             {
@@ -192,10 +193,10 @@ namespace GraphProcessor
                 //get the name of the parameter Node
                 var parameterName = parameter.name;
               
-                createToggle(modularAvatar, menuObject, toggle.togglename, FindParameter(parametercache,parameterName).aacParameter as AacFlIntParameter, 0, toggle.icon);
-                IterateNodes(toggle.GetPort(nameof(ANPUA_Menu_Toggle.link_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                //createToggle(modularAvatar, menuObject, toggle.togglename, FindParameter(parametercache,parameterName).aacParameter as AacFlIntParameter, 0, toggle.icon);
+                IterateNodes(toggle.GetPort(nameof(ANPUA_Menu_Toggle.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
             }
-            var link_OUT = node.GetPort(nameof(ANPUA_Menu.link_OUT), null);
+            var link_OUT = node.GetPort(nameof(ANPUA_Menu.link_Menu_OUT), null);
         }
 
 
@@ -263,46 +264,6 @@ namespace GraphProcessor
             return parametercache.FirstOrDefault(p => p.name == name);
         }
 
-
-        public static GameObject createSubMenu(MaAc maS, GameObject target, string name, Texture2D ico = null)
-        {
-            GameObject menuObject = new GameObject(name);
-            menuObject.transform.parent = target.transform;
-            if (ico != null)
-            {
-                maS.EditMenuItem(menuObject).Name(name).WithIcon(ico);
-            }
-            else
-            {
-                maS.EditMenuItem(menuObject).Name(name);
-            }
-
-            ModularAvatarMenuItem menu = menuObject.GetComponent<ModularAvatarMenuItem>();
-            if (menu != null)
-            {
-                menu.MenuSource = SubmenuSource.Children;
-                menu.Control.type = VRCExpressionsMenu.Control.ControlType.SubMenu;
-            }
-            return menuObject;
-        }
-
-
-        public static GameObject createToggle(MaAc maS, GameObject target, string name, AacFlIntParameter parameter, int index, Texture2D ico = null)
-        {
-            //Create a new Gameobject under the target, with the given name with the type toggle using the given parameter and index
-            GameObject subItem = new GameObject(name);
-            subItem.transform.parent = target.transform;
-            if (ico == null)
-            {
-                maS.EditMenuItem(subItem).Name(name).ToggleSets(parameter, index);
-            }
-            else
-            {
-                maS.EditMenuItem(subItem).Name(name).ToggleSets(parameter, index).WithIcon(ico);
-            }
-
-            return subItem;
-        }
 
 
 
