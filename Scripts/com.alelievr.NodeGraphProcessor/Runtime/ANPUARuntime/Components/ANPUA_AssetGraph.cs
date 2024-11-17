@@ -140,14 +140,15 @@ namespace GraphProcessor
         private void GenerateMenu(BaseGraph graph, GameObject target, MaAc modularAvatar, ANPUA_StartNode descriptor)
         {
             //Create the Menu
-            GameObject menuObject = MA_Wrapper.createSubMenu(modularAvatar, target, descriptor.name, null);
+            GameObject menuObject;
+            (menuObject, _) = MA_Wrapper.createSubMenu(modularAvatar, target, descriptor.name, null);
 
             //get the Connected Nodes using the GetConnectedNodes Function
             var connectedNodes = descriptor.GetPort(nameof(ANPUA_StartNode.link_OUT_Menu), null).GetEdges().Select(e => e.inputNode).ToList();
             foreach (var node in connectedNodes)
             {
                 IterateNodes(node, modularAvatar, menuObject);
-            }
+            } 
 
             //Iterate all connected Nodes
             // foreach (var node in connectedNodes)
