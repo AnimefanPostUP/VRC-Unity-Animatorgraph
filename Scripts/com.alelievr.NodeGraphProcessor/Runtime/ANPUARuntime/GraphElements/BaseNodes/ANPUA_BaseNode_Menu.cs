@@ -10,7 +10,7 @@ using UnityEngine;
 namespace GraphProcessor
 {
     [System.Serializable]
-    public class ANPUA_BaseNode_Menu : BaseNode, ANPUA_INode
+    public class ANPUA_BaseNode_Menu : ANPUA_BaseNode, ANPUA_INode
     {
         [Input, Vertical]
         public ANPUA_NodeLink_Menu link_Menu_IN;
@@ -19,20 +19,7 @@ namespace GraphProcessor
         public IEnumerable<ANPUA_NodeLink_Menu> link_Menu_OUT;
 
         public ANPUA_Container_Menu menuContainer;
-
-
-        public IEnumerable<ConditionalNode> GetExecutedNodes()
-        {
-            // Return all the nodes connected to the executes port
-            return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
-        }
-
-       //ProcessMenuNode virtual method
-        public virtual void ProcessMenuNode()
-        {
-            //Process the menu node
-        }
-
+        
         protected override void Process()
         {
             base.Process();

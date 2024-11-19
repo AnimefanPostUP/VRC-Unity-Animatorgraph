@@ -23,7 +23,7 @@ namespace GraphProcessor
 
         //ProcessMenuNode
 
-        public override void ProcessMenuNode()
+        public override void ProcessOnBuild()
         {
             ANPUA_BaseNode_Menu inputnode=GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as ANPUA_BaseNode_Menu;
             ANPUA_Container_Menu inputMenuContainer = inputnode.menuContainer;

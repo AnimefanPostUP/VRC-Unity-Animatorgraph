@@ -31,7 +31,7 @@ namespace GraphProcessor
         public float value;
 
 
-        public override void ProcessMenuNode()
+        public override void ProcessOnBuild()
         {
             ANPUA_BaseNode_Menu inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as ANPUA_BaseNode_Menu;
             menuContainer = inputnode.menuContainer;

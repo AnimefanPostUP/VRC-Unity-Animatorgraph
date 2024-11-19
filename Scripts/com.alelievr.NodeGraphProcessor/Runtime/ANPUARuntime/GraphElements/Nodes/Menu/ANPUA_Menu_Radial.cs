@@ -15,7 +15,7 @@ namespace GraphProcessor
         public override string name => "Menu Radial";
 
 
-        public override void ProcessMenuNode()
+        public override void ProcessOnBuild()
         {
             //to be coded
 
