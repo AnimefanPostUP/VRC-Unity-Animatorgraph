@@ -8,24 +8,22 @@ using UnityEngine;
 namespace GraphProcessor
 {
 
-	[System.Serializable, NodeMenuItem("Basic/Descriptor")]
+	[System.Serializable, NodeMenuItem("Basic/Start Build Node")]
 	public class ANPUA_StartNode : BaseNode, ANPUA_INode
 	{
 
 		public override Color color => new Color(0.7f, 0.7f, 0.7f);
 
 
-		[Output(name = "Tasks", allowMultiple = true)]
-		public ANPUA_NodeLink_Task link_OUT;
+		[Output(name = "Layer", allowMultiple = true)]
+		public ANPUA_NodeLink_Layer link_OUT;
 
-		[Output(name = "Menus", allowMultiple = true)]
+		[Output(name = "Menu Installer", allowMultiple = true)]
 		public ANPUA_NodeLink_Menu link_OUT_Menu;
 
-		//Input NodeLinkParameter
-		[Input(name = "Parameters", allowMultiple = true)]
-		public ANPUA_NodeLink_Parameter link_Parameter;
+		
 
-		public override string name => "Descriptor";
+		public override string name => "Start Build Node";
 
 		public IEnumerable<ConditionalNode> GetExecutedNodes()
 		{

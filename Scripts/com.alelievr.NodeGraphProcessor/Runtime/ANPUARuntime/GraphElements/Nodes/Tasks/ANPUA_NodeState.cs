@@ -1,36 +1,80 @@
 
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using GraphProcessor;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
 namespace GraphProcessor
 {
-	[System.Serializable, NodeMenuItem("Basic/Animate")]
-	public class ANPUA_Task_Animate : BaseNode, ANPUA_INode
+	[System.Serializable, NodeMenuItem("Basic/State")]
+	public class ANPUA_NodeState : ANPUA_BaseNode_State, ANPUA_INode
 	{
+
+		public override string name => "Node";
+		public override bool isRenamable => true;
+
+		public override Color color => new Color(0.7f, 0.5f, 0.7f);
 
 		[Input(name = "Task", allowMultiple = true)]
 		public ANPUA_NodeLink_Task inputs;
 
 
-		[Input(name = "Curve(s)", allowMultiple = true)]
+		[Input(name = "Motion", allowMultiple = true)]
 		public ANPUA_NodeLink_Curve animations_IN;
 
-		[Output(name = "Curve(s)")]
-		public ANPUA_NodeLink_Curve curve_OUT; // TODO: custom function for this one
+		//State Name, Speed, Motion Time, Multiplier that can be enabled by Settings
+
+		//Settings
+		[Setting(name = "Speed Multiplier"), SerializeField]
+		public bool enableMultiplier = false;
+
+		[Setting(name = "Motion"), SerializeField]
+		public bool enableMotionTime = false;
+
+		[Setting(name = "Speed"), SerializeField]
+		public bool enableSpeed = false;
+
+		//Speed
+		[Input(name = "Speed", allowMultiple = false), SerializeField]
+		public float speed;
+
+		//Motion Time
+		[Input(name = "Motion Time", allowMultiple = false)]
+		public ANPUA_NodeLink_Parameter motionTime;
+
+		//Multiplier
+		[Input(name = "Multiplier", allowMultiple = false)]
+		public ANPUA_NodeLink_Parameter multiplier;
 
 
+
+		// [CustomPortBehavior(nameof(speed))] 
+		// IEnumerable<PortData> GetInputPort(List<SerializableEdge> edges)
+		// {
+		// 	// Hide the port if the setting is disabled
+		// 	if (enableSpeed)
+		// 	{ 
+		// 		//Add port if doesnt exist
+		// 		yield return new PortData { displayName = "Speed", displayType = typeof(float), acceptMultipleEdges = false };
+		// 	} 		
+		// }
+
+
+
+		// Method to update the ports
+		//Maybe Displaying Based on a Setting
+		//[Output(name = "Motion")] 
+		//public ANPUA_NodeLink_Curve curve_OUT; // TODO: custom function for this one
 
 		//Out CurveData
-		[Output(name = "Task- 1")]
-		public ANPUA_NodeLink_Task link_OUT;
+		// [Output(name = "Task- 1")]
+		// public ANPUA_NodeLink_Task link_OUT;
 
-
-		public override string name => "Animate";
 
 
 		// We keep the max port count so it doesn't cause binding issues
@@ -49,9 +93,15 @@ namespace GraphProcessor
 		}
 
 
-		//Out CurveData
-
-
+		[CustomPortBehavior(nameof(speed))]
+		IEnumerable<PortData> GetPortsForInputs(List<SerializableEdge> edges)
+		{
+			// Hide the port if the setting is disabled
+			if (enableSpeed)
+			{
+				yield return new PortData { displayName = "Speed", displayType = typeof(float), acceptMultipleEdges = false };
+			}
+		}
 
 
 		[CustomPortBehavior(nameof(outputs))]
@@ -63,7 +113,7 @@ namespace GraphProcessor
 			{
 				yield return new PortData
 				{
-					displayName = "Task- " + (i+2),
+					displayName = "Task " + (i),
 					displayType = typeof(ANPUA_NodeLink_Task),
 					identifier = i.ToString(), // Must be unique
 				};
