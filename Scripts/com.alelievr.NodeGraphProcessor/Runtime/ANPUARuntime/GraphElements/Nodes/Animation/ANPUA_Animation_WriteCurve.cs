@@ -11,15 +11,15 @@ namespace GraphProcessor
 	public class ANPUA_Animation_WriteCurve : BaseNode, ANPUA_INode
 	{
 
-		[Input(name = "Curve A", allowMultiple = false)]
-		public ANPUA_NodeLink_Curve curvedata_A_IN;
+		[Input(name = "Clip A", allowMultiple = false)]
+		public ANPUA_NodeLink_Anim_Clip curvedata_A_IN;
 
-        [Input(name = "Curve B", allowMultiple = false)]
-		public ANPUA_NodeLink_Curve curvedata_B_IN;
+        [Input(name = "Clip B", allowMultiple = false)]
+		public ANPUA_NodeLink_Anim_Clip curvedata_B_IN;
 
 		//Out CurveData
-		[Output(name = "Curve")]
-		public ANPUA_NodeLink_Curve link_CurveData_OUT;
+		[Output(name = "Clip")]
+		public ANPUA_NodeLink_Anim_Clip link_CurveData_OUT;
 
         //Enum for Addative, Overwrite, Paralell
 

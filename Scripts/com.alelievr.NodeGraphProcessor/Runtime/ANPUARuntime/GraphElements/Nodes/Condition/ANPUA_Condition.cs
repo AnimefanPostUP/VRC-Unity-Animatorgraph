@@ -9,10 +9,21 @@ using UnityEngine;
 
 namespace GraphProcessor
 {
-    [System.Serializable, NodeMenuItem("Logic/If")]
-    public class ANPUA_Condition : BaseNode, ANPUA_INode
+
+    //Enum BranchNode
+
+    public enum BranchMode
     {
-        public override string name => "If Statement";
+        Nothing,
+        Return,
+        AnyReturn,
+    }
+
+    [System.Serializable, NodeMenuItem("Logic/Branch")]
+    public class ANPUA_Condition : BaseNode, ANPUA_INode 
+    {
+        public override string name => "Branch";
+        public override bool isRenamable => true;
         public override Color color => new Color(0.2f, 0.3f, 0.5f);
 
         [Input(name = "Task", allowMultiple = true)]
@@ -28,8 +39,14 @@ namespace GraphProcessor
         [Output(name = "false", allowMultiple = true)]
         public ANPUA_NodeLink_Task false_OUT;
 
-        [Setting(name = "Unidirectional")]
-        public bool unidirectional = false;
+
+        //[Input(name = "Return on False"), SerializeField]
+        [SerializeField]
+        public BranchMode onFalse = BranchMode.Nothing;
+
+        // [Setting(name = "Unidirectional")]
+        // [SerializeField]
+        // public bool unidirectional = false;
 
 
         //         public class IfNode : ConditionalNode

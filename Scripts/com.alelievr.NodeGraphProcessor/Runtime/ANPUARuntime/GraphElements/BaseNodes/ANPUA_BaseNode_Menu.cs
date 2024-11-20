@@ -18,8 +18,9 @@ namespace GraphProcessor
         [Output, Vertical]
         public IEnumerable<ANPUA_NodeLink_Menu> link_Menu_OUT;
 
+        [HideInInspector]
         public ANPUA_Container_Menu menuContainer;
-        
+
         protected override void Process()
         {
             base.Process();

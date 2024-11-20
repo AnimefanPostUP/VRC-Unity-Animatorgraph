@@ -9,6 +9,7 @@ using UnityEditor;
 using System;
 using System.Linq;
 
+
 namespace GraphProcessor
 {
 
@@ -207,8 +208,8 @@ namespace GraphProcessor
 
 							style =
 						{
-							width = 25,
-							height = 25,
+							width = 50,
+							height = 50,
 								  backgroundImage = new StyleBackground((Texture2D)EditorGUIUtility.IconContent( getIconPath(node.Item2)).image),
 						}
 						};
@@ -259,7 +260,7 @@ namespace GraphProcessor
 							marginBottom = 10
 						}
 					};
-					box.Add(title);
+					//box.Add(title);
 
 					// Create a new container for the subgroup
 					var subgroupContainer = new VisualElement
@@ -285,10 +286,44 @@ namespace GraphProcessor
 		{
 			//use dictionary to get the path
 			//check if the type is in the dictionary
-			if (nodeTypeToPath.ContainsKey(type))
-				return nodeTypeToPath[type];
-			// unity icon
-			return "d__Help@2x";
+			// if (nodeTypeToPath.ContainsKey(type))
+			// 	return nodeTypeToPath[type];
+
+			//using following path for now:
+			//\Assets\VRC-Unity-Animatorgraph-\Scripts\com.alelievr.NodeGraphProcessor\Editor\Views
+
+			//Get folderpath
+			string folderPath = "Assets/VRC-Unity-Animatorgraph-/Scripts/com.alelievr.NodeGraphProcessor/Editor/Views/NodePanelIcons/";
+
+			//Get the name of the Node
+			string name = type.Name;
+			//Debug.Log(name); 
+
+
+
+			//Use Unity to try finding the Icon at the relative path name.png
+			Texture2D icon = AssetDatabase.LoadAssetAtPath<Texture2D>(folderPath + name + ".png");
+			if (icon != null)
+			{
+				//Debug.Log("Icon Found");
+				return folderPath + name + ".png";
+			}
+			else
+			{
+				Texture2D icon2 = AssetDatabase.LoadAssetAtPath<Texture2D>(folderPath + "NONE" + ".png");
+				if (icon2 != null)
+				{
+					//Debug.Log("Icon Found");
+					return folderPath + "NONE" + ".png";
+				}
+				else
+				{
+					//Debug.Log("Icon Not Found");
+					return "TestFailed";
+				}
+			}
+
+
 		}
 
 		// Method to add elements to row containers
@@ -360,32 +395,32 @@ namespace GraphProcessor
 
 		}
 
-        // Callbacks
-        private void OnDragUpdatedEvent(DragUpdatedEvent evt)
-        {
-            if (DragAndDrop.GetGenericData("NodeType") != null)
-            {
-                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-                evt.StopPropagation();
-            }
-        }
+		// Callbacks
+		private void OnDragUpdatedEvent(DragUpdatedEvent evt)
+		{
+			if (DragAndDrop.GetGenericData("NodeType") != null)
+			{
+				DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+				evt.StopPropagation();
+			}
+		}
 
-        private void OnDragPerformEvent(DragPerformEvent evt)
-        {
-            if (DragAndDrop.GetGenericData("NodeType") != null)
-            {
-                var nodeType = DragAndDrop.GetGenericData("NodeType") as Type;
-                var mousePosition = evt.mousePosition;
-                var graphPosition = graphView.contentViewContainer.WorldToLocal(mousePosition);
+		private void OnDragPerformEvent(DragPerformEvent evt)
+		{
+			if (DragAndDrop.GetGenericData("NodeType") != null)
+			{
+				var nodeType = DragAndDrop.GetGenericData("NodeType") as Type;
+				var mousePosition = evt.mousePosition;
+				var graphPosition = graphView.contentViewContainer.WorldToLocal(mousePosition);
 
-                // Create the node at the drop position
-                graphView.AddNode(BaseNode.CreateFromType(nodeType, graphPosition));
+				// Create the node at the drop position
+				graphView.AddNode(BaseNode.CreateFromType(nodeType, graphPosition));
 
-                DragAndDrop.AcceptDrag();
-                DragAndDrop.SetGenericData("NodeType", null);
-                evt.StopPropagation();
-            }
-        }
+				DragAndDrop.AcceptDrag();
+				DragAndDrop.SetGenericData("NodeType", null);
+				evt.StopPropagation();
+			}
+		}
 
 
 	}

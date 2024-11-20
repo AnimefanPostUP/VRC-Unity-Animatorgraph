@@ -11,11 +11,11 @@ namespace GraphProcessor
     [System.Serializable, NodeMenuItem("Animation/Curves/Combine Curves")]
     public class ANPUA_Curve_Curve : BaseNode, ANPUA_INode
     {
-        [Input(name = "Curve A", allowMultiple = false)]
-        public ANPUA_NodeLink_Curve link_A;
+        [Input(name = "Clip A", allowMultiple = false)]
+        public ANPUA_NodeLink_Anim_Clip link_A;
 
-        [Input(name = "Curve B", allowMultiple = false)]
-        public ANPUA_NodeLink_Curve link_B;
+        [Input(name = "Clip B", allowMultiple = false)]
+        public ANPUA_NodeLink_Anim_Clip link_B;
 
         //Float Length
         [Input(name = "Length", allowMultiple = false), SerializeField]
@@ -23,8 +23,8 @@ namespace GraphProcessor
 
 
 
-        [Output(name = "Curve(s)", allowMultiple = true), SerializeField]
-        public ANPUA_NodeLink_Curve link_OUT;
+        [Output(name = "Clip", allowMultiple = true), SerializeField]
+        public ANPUA_NodeLink_Anim_Clip link_OUT;
 
 
         public override string name => "Combine Curves";

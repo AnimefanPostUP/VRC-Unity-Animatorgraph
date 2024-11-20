@@ -25,7 +25,7 @@ namespace GraphProcessor
 
 
 		[Input(name = "Motion", allowMultiple = true)]
-		public ANPUA_NodeLink_Curve animations_IN;
+		public ANPUA_NodeLink_Anim_Clip animations_IN;
 
 		//State Name, Speed, Motion Time, Multiplier that can be enabled by Settings
 

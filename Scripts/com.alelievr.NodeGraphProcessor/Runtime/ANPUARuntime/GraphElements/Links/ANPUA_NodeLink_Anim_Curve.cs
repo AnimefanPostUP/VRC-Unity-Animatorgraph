@@ -5,5 +5,5 @@ using UnityEngine;
 
 namespace GraphProcessor
 {
-    public struct ANPUA_NodeLink_Curve{}
+    public struct ANPUA_NodeLink_Anim_Curve{}
 }

@@ -8,20 +8,17 @@ using UnityEngine;
 
 namespace GraphProcessor
 {
-    [System.Serializable, NodeMenuItem("Animation/Curves/SetActive")]
-    public class ANPUA_Curve_IsActive : BaseNode, ANPUA_INode
+    [System.Serializable, NodeMenuItem("Animation/Curves/Default Motion")]
+    public class ANPUA_Curve_Defaults : BaseNode, ANPUA_INode
     {
-        [Output(name = "Curve", allowMultiple = true)]
-        public ANPUA_NodeLink_Curve link_IN;
+        [Output(name = "Motiondata", allowMultiple = true)]
+        public ANPUA_NodeLink_Anim_Clip link_OUT;
 
-        //Gameobject Array
-        [Input(name = "Gameobject(s)", allowMultiple = true), SerializeField] 
-        public GameObject gameObject;
 
         //[Input(name = "isActive (bool)", allowMultiple = false)]
         public bool isActive;
 
-        public override string name => "SetActive";
+        public override string name => "Default Motiondata";
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {

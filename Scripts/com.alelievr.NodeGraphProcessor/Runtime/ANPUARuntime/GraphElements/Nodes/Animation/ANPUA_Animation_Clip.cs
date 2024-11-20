@@ -11,14 +11,14 @@ namespace GraphProcessor
     [System.Serializable, NodeMenuItem("Animation/Clip/Use File")]
     public class ANPUA_Animation_Clip : BaseNode, ANPUA_INode
     {
-        [Output(name = "Curve(s)", allowMultiple = true)]
-        public ANPUA_NodeLink_Curve link_OUT;
+        [Output(name = "Motiondata", allowMultiple = true)]
+        public ANPUA_NodeLink_Anim_Clip link_OUT;
 
         [Input(name = "Clip", allowMultiple = false), SerializeField]
         public AnimationClip clip;
 
 
-        public override string name => "Clip (File)";
+        public override string name => "Animationclip";
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
