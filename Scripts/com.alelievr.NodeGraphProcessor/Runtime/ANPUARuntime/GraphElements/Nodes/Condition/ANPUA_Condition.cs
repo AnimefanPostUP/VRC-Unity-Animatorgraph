@@ -14,13 +14,13 @@ namespace GraphProcessor
 
     public enum BranchMode
     {
-        Nothing,
+        None,
         Return,
         AnyReturn,
     }
 
     [System.Serializable, NodeMenuItem("Logic/Branch")]
-    public class ANPUA_Condition : BaseNode, ANPUA_INode 
+    public class ANPUA_Condition : BaseNode, ANPUA_INode
     {
         public override string name => "Branch";
         public override bool isRenamable => true;
@@ -39,10 +39,13 @@ namespace GraphProcessor
         [Output(name = "false", allowMultiple = true)]
         public ANPUA_NodeLink_Task false_OUT;
 
+        [SerializeField]
+        public ANPUA_ConditionContainer[] conditionContainer = new ANPUA_ConditionContainer[0];
+
 
         //[Input(name = "Return on False"), SerializeField]
         [SerializeField]
-        public BranchMode onFalse = BranchMode.Nothing;
+        public BranchMode onFalse = BranchMode.None;
 
         // [Setting(name = "Unidirectional")]
         // [SerializeField]

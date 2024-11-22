@@ -15,7 +15,10 @@ namespace GraphProcessor
 		public override Color color => new Color(0.7f, 0.7f, 0.7f);
 
 		public override string name => "Layer";
-		
+
+
+		[Input(name = "Mein String", allowMultiple = false)]
+		public string meinstring;
 
 		[Input(name = "Layer", allowMultiple = true)]
 		public ANPUA_NodeLink_Layer link_IN;

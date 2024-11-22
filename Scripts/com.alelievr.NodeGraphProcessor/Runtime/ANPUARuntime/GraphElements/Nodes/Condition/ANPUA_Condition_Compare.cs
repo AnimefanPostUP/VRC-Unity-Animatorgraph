@@ -22,27 +22,13 @@ namespace GraphProcessor
         [Input(name = "Variable", allowMultiple = false)]
         public ANPUA_NodeLink_Variable varB_IN;
 
-        
-
-        //Enum for comparison, e.g. Greater, Less, Equal, GreaterOrEqual, LessOrEqual, NotEqual
-        public CompareEnum compare_IN;
-
-        public enum CompareEnum
-        {
-            Greater,
-            Less,
-            Equal,
-            GreaterOrEqual,
-            LessOrEqual,
-            NotEqual
-        }
-
-
 
         [Output(name = "Logic", allowMultiple = true)]
         public ANPUA_NodeLink_Logic link_OUT;
 
-
+        //Maybe to Implement Later
+        //[Output(name = "Logic", allowMultiple = true)]
+        //public ANPUA_NodeLink_Comparemode link_OUT;
  
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
