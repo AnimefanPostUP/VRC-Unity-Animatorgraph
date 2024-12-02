@@ -2,13 +2,14 @@
  ANPUA AnimefanPostUPs AnimatorGraph
 
 State of the Progress:
--Main Windows etc. were Integrated into the Original Node Graph Framework
--Menu Building is Partially Done
--Animator Parameter Windows UI and Code were Written
--A Basic Set of Nodes that will be Updated During Developement were created
--A List of Possible Features was Collected
--Main Building Script was Structured Partially
--First Concepts of Icons for the UI were Made
+</br>
+-Main Windows etc. were Integrated into the Original Node Graph Framework</br>
+-Menu Building is Partially Done</br>
+-Animator Parameter Windows UI and Code were Written</br>
+-A Basic Set of Nodes that will be Updated During Developement were created</br>
+-A List of Possible Features was Collected</br>
+-Main Building Script was Structured Partially</br>
+-First Concepts of Icons for the UI were Made</br>
 
 Its exspected that it will take another Few Weeks atleast to make the Core of the Project Usable and Functional.
 
