@@ -34,12 +34,15 @@ namespace GraphProcessor
 
 
         public override MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterManager)
-        {     
+        {
             Debug.Log("AnimatorGraph: ...Creating Installer");
-            //ModularAvatarMenuInstaller menuinstaller = MA_Wrapper.createMenuInstaller(menuContainer.menuObject); //needs targetMenuImplementation!!!
-            //menuContainer = new MaItemContainer(menuContainer.maS, menuContainer.menuObject, null);
+            var newObject = MA_Wrapper.createSubMenu(menuContainer.maS, menuContainer.menuObject, menuname, icon);
+            ModularAvatarMenuInstaller menuinstaller = MA_Wrapper.createMenuInstaller(newObject); //needs targetMenuImplementation!!!
+
+
+            menuContainer = new MaItemContainer(menuContainer.maS, newObject, null);
             return menuContainer;
-       
+
         }
 
 

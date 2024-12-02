@@ -87,7 +87,7 @@ namespace GraphProcessor
             MaAc menuTarget = MaAc.Create(new GameObject(SystemName + "maS") { transform = { parent = ctx.AvatarRootTransform } });
 
             //MaAc menuTarget = MaAc.Create(new GameObject(SystemName + "maS") { transform = { parent = ctx.AvatarRootTransform } });
-            var ob2 = MA_Wrapper.createSubMenu(menuTarget, assetTarget, "CoreMenu");
+            //var ob2 = MA_Wrapper.createSubMenu(menuTarget, assetTarget, "CoreMenu");
             //Add empty toggle with new parameter
 
             //add Layer
@@ -97,10 +97,10 @@ namespace GraphProcessor
 
             //Prepare Menu Container Object
             BuildNode descriptor = FindDescriptorNode(graphData);
-            descriptor.menuContainer = new MaItemContainer(menuTarget, ob2, null);
+            descriptor.menuContainer = new MaItemContainer(menuTarget, assetTarget, null);
             //descriptor.InitializeMenuContainer(modularAvatar, rootObject);
 
-            GenerateMenu(graphData, ob2, menuTarget, descriptor);
+            GenerateMenu(graphData, assetTarget, menuTarget, descriptor);
 
             //modularAvatar.NewMergeAnimator(ctrl.AnimatorController, VRCAvatarDescriptor.AnimLayerType.FX);
         }
