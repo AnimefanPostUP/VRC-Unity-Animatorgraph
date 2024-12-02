@@ -7,6 +7,7 @@ using GraphProcessor;
 using UnityEngine;
 using MA_Wrapper = GraphProcessor.MaWrapper;
 using nadena.dev.modular_avatar.core;
+using AnimatorAsCode.V1;
 
 namespace GraphProcessor
 {
@@ -30,17 +31,38 @@ namespace GraphProcessor
 
         public float value;
 
-
-        public override void ProcessOnBuild()
+        //Uses the Value of the Default Parameter Currently, needs to be adjusted!
+        public override MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterTable)
         {
-            MenuBaseNode inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as MenuBaseNode;
-            menuContainer = inputnode.menuContainer;
+            ANPUA_BuildCache_Parameter param = parameterTable.FindParameter("Test1");
+            AacFlParameter parameterAnyType = param.aacParameter;
+            //Add toggle to menu container
+            if (param.type == ANPUA_ParameterType.Bool)
+            {
+                AacFlBoolParameter boolParam = (AacFlBoolParameter)parameterAnyType;
+                MA_Wrapper.createToggle(menuContainer.maS, menuContainer.menuObject, togglename, boolParam, param.boolValue, icon);
+            }
+            else if (param.type == ANPUA_ParameterType.Float)
+            {
+                AacFlFloatParameter floatParam = (AacFlFloatParameter)parameterAnyType;
+                MA_Wrapper.createToggle(menuContainer.maS, menuContainer.menuObject, togglename, floatParam, param.floatValue, icon);
+
+            }
+            else if (param.type == ANPUA_ParameterType.Int)
+            {
+                AacFlIntParameter intParam = (AacFlIntParameter)parameterAnyType;
+                MA_Wrapper.createToggle(menuContainer.maS, menuContainer.menuObject, togglename, intParam, param.intValue, icon);
+            }
+
+
+            menuContainer = menuContainer;
+            return menuContainer;
         }
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
             // Return all the nodes connected to the executes port
-            return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
+            return null;
         }
         public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
         {

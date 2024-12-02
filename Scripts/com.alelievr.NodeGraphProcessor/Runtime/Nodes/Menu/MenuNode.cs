@@ -22,24 +22,27 @@ namespace GraphProcessor
         public Texture2D icon;
 
         //ProcessMenuNode
-
-        public override void ProcessOnBuild()
+        public override MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterManager)
         {
-            MenuBaseNode inputnode=GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as MenuBaseNode;
-            MaItemContainer inputMenuContainer = inputnode.menuContainer;
-
+            Debug.Log("AnimatorGraph: ...Creating SubMenu");
             GameObject newMenuObject;
             ModularAvatarMenuItem newMenuItem;
 
-            (newMenuObject, newMenuItem)= MA_Wrapper.createSubMenu (inputMenuContainer.maS, inputMenuContainer.menuObject, menuname, icon);
-            menuContainer=new MaItemContainer( inputMenuContainer.maS, newMenuObject, newMenuItem);
+           newMenuObject= MA_Wrapper.createSubMenu(menuContainer.maS, menuContainer.menuObject, menuname, icon);
+            menuContainer=new MaItemContainer( menuContainer.maS, newMenuObject, null);
+            return menuContainer;
+        }
+
+        public override void ProcessOnBuild()
+        {
+           
         }
         
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
             // Return all the nodes connected to the executes port
-            return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
+            return null;
         }
 
         public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)

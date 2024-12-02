@@ -3,14 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using GraphProcessor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
 namespace GraphProcessor
 {
     [System.Serializable]
-    public class MenuBaseNode : AnimatorNode, Animator_INode
+    public class MenuBaseNode : AnimatorNode
     {
         [Input, Vertical]
         public ANPUA_NodeLink_Menu link_Menu_IN;
@@ -25,6 +27,9 @@ namespace GraphProcessor
         {
             base.Process();
         }
+
+        public virtual MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterManager) { return null; }
+
 
         [CustomPortBehavior(nameof(link_Menu_OUT))]
         IEnumerable<PortData> GetPortsForOutputs(List<SerializableEdge> edges)

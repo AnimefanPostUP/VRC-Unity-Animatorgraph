@@ -21,7 +21,7 @@ namespace GraphProcessor
     public class MaWrapper : MonoBehaviour
     {
 
-        public static ModularAvatarMenuInstaller createMenuInstaller(GameObject target, VRCExpressionsMenu menu )
+        public static ModularAvatarMenuInstaller createMenuInstaller(GameObject target, VRCExpressionsMenu menu = null )
         {
             // Check if the target already has a ModularAvatarMenuInstaller component
             var installer = target.GetComponent<ModularAvatarMenuInstaller>();
@@ -32,13 +32,17 @@ namespace GraphProcessor
 
             //public VRCExpressionsMenu menuToAppend;
             //public VRCExpressionsMenu installTargetMenu;
-
-            installer.installTargetMenu = menu;
+            //if not null
+            if (menu != null)
+            {
+                installer.menuToAppend = menu;
+            }
+   
 
             return installer;
         }
 
-        public static (GameObject menuObject, ModularAvatarMenuItem menu) createSubMenu(MaAc maS, GameObject target, string name, Texture2D ico = null)
+        public static GameObject createSubMenu(MaAc maS, GameObject target, string name, Texture2D ico = null)
         {
             GameObject menuObject = new GameObject(name);
             menuObject.transform.parent = target.transform;
@@ -57,7 +61,7 @@ namespace GraphProcessor
                 menu.MenuSource = SubmenuSource.Children;
                 menu.Control.type = VRCExpressionsMenu.Control.ControlType.SubMenu;
             }
-            return (menuObject, menu);
+            return menuObject;
         }
 
 
@@ -78,6 +82,44 @@ namespace GraphProcessor
 
             return (subItem, subItem.GetComponent<ModularAvatarMenuItem>());
         }
+
+                public static (GameObject menuObject, ModularAvatarMenuItem menu) createToggle(MaAc maS, GameObject target, string name, AacFlFloatParameter parameter, float index, Texture2D ico = null)
+        {
+            //Create a new Gameobject under the target, with the given name with the type toggle using the given parameter and index
+            GameObject subItem = new GameObject(name);
+            subItem.transform.parent = target.transform;
+
+            if (ico == null)
+            {
+                maS.EditMenuItem(subItem).Name(name).ToggleSets(parameter, index);
+            }
+            else
+            {
+                maS.EditMenuItem(subItem).Name(name).ToggleSets(parameter, index).WithIcon(ico);
+            }
+
+            return (subItem, subItem.GetComponent<ModularAvatarMenuItem>());
+        }
+
+
+        public static (GameObject menuObject, ModularAvatarMenuItem menu) createToggle(MaAc maS, GameObject target, string name, AacFlBoolParameter parameter, bool index, Texture2D ico = null)
+        {
+            //Create a new Gameobject under the target, with the given name with the type toggle using the given parameter and index
+            GameObject subItem = new GameObject(name);
+            subItem.transform.parent = target.transform;
+
+            if (ico == null)
+            {
+                maS.EditMenuItem(subItem).Name(name).Toggle(parameter);
+            }
+            else
+            {
+                maS.EditMenuItem(subItem).Name(name).Toggle(parameter).WithIcon(ico);
+            }
+
+            return (subItem, subItem.GetComponent<ModularAvatarMenuItem>());
+        }
+
 
 
     }

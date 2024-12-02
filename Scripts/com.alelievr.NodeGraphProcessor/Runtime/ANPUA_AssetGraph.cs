@@ -26,16 +26,17 @@ namespace GraphProcessor
     public class ANPUA_AssetGraph : MonoBehaviour, IEditorOnly
     {
         public BaseGraph graphData;
+        public GameObject assetTarget;
     }
 
 
     public class ANPUA_AssetGraphProcessor : Plugin<ANPUA_AssetGraphProcessor>
     {
 
-        public override string QualifiedName => "dev.hai-vr.docs.animator-as-code.maac-clothsystem-toggle";
-        public override string DisplayName => "Clothsystem Toggle";
+        public override string QualifiedName => "dev.hai-vr.docs.animator-as-code.maac-AnimatorGraph";
+        public override string DisplayName => "AnimatorGraph";
 
-        private const string SystemName = "ClothSysMAAC";
+        private const string SystemName = "AnimatorGraphMAAC";
         private const bool UseWriteDefaults = true;
 
         private AacFlLayer baseLayer; protected override void Configure()
@@ -45,56 +46,7 @@ namespace GraphProcessor
         }
 
 
-        //Class that can hold a Parameters Name, Type, SyncState and AacFlParameter and MaacParameter
-        public class ANPUA_BuildCache_Parameter
-        {
-            public string name;
-            public ANPUA_ParameterType type;
-            public ANPUA_ParameterSyncState syncState;
-            public ANPUA_ParameterState state;
-            public AacFlParameter aacParameter;
-            public MaacParameter<int> maacParameterInt;
-            public MaacParameter<float> maacParameterFloat;
-            public MaacParameter<bool> maacParameterBool;
-
-
-            public ANPUA_BuildCache_Parameter(string name, ANPUA_ParameterType type, ANPUA_ParameterSyncState syncState, ANPUA_ParameterState state, AacFlParameter aacParameter, MaacParameter<int> maacParameterInt = null, MaacParameter<float> maacParameterFloat = null, MaacParameter<bool> maacParameterBool = null)
-            {
-                this.name = name;
-                this.type = type;
-                this.syncState = syncState;
-                this.state = state;
-                this.aacParameter = aacParameter;
-
-                this.maacParameterInt = maacParameterInt;
-                this.maacParameterFloat = maacParameterFloat;
-                this.maacParameterBool = maacParameterBool;
-            }
-
-            //get the MaacParameter
-            public MaacParameter<T> GetMaacParameter<T>()
-            {
-                if (typeof(T) == typeof(int))
-                {
-                    return maacParameterInt as MaacParameter<T>;
-                }
-                else if (typeof(T) == typeof(float))
-                {
-                    return maacParameterFloat as MaacParameter<T>;
-                }
-                else if (typeof(T) == typeof(bool))
-                {
-                    return maacParameterBool as MaacParameter<T>;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
-
-        private List<ANPUA_BuildCache_Parameter> parametercache;
+     private ANPUA_ParameterManager paramtermanager;
 
         private void Generate(BuildContext ctx)
         {
@@ -108,6 +60,11 @@ namespace GraphProcessor
             //Get the Graph from the Component
             var graphData = components[0].graphData;
             if (graphData == null) return;
+
+            var assetTarget = components[0].assetTarget;
+            if (assetTarget == null) return;
+
+
 
 
             // Initialize Animator As Code.
@@ -123,88 +80,99 @@ namespace GraphProcessor
             });
             var ctrl = aac.NewAnimatorController();
 
-            MaAc modularAvatar = MaAc.Create(new GameObject(SystemName) { transform = { parent = ctx.AvatarRootTransform } });
+
+            //Modular AV for the Sets itself
+            // MaAc modularAvatar = MaAc.Create(new GameObject(SystemName) { transform = { parent = ctx.AvatarRootTransform } });
+            //Modular AV for the Set Menus
+            MaAc menuTarget = MaAc.Create(new GameObject(SystemName + "maS") { transform = { parent = ctx.AvatarRootTransform } });
+
             //MaAc menuTarget = MaAc.Create(new GameObject(SystemName + "maS") { transform = { parent = ctx.AvatarRootTransform } });
+            var ob2 = MA_Wrapper.createSubMenu(menuTarget, assetTarget, "CoreMenu");
+            //Add empty toggle with new parameter
 
             //add Layer
             baseLayer = ctrl.NewLayer("BaseLayer");
 
-            parametercache = GenerateParameters(graphData, baseLayer, modularAvatar);
+            paramtermanager = new ANPUA_ParameterManager(GenerateParameters(graphData, baseLayer, menuTarget));
 
-            //Get the Gameobject of the component as the target for the Set
-            var target = components[0].gameObject;
-            modularAvatar.NewMergeAnimator(ctrl.AnimatorController, VRCAvatarDescriptor.AnimLayerType.FX);
+            //Prepare Menu Container Object
+            BuildNode descriptor = FindDescriptorNode(graphData);
+            descriptor.menuContainer = new MaItemContainer(menuTarget, ob2, null);
+            //descriptor.InitializeMenuContainer(modularAvatar, rootObject);
+
+            GenerateMenu(graphData, ob2, menuTarget, descriptor);
+
+            //modularAvatar.NewMergeAnimator(ctrl.AnimatorController, VRCAvatarDescriptor.AnimLayerType.FX);
         }
 
         //Recursive Function to Generate the Menu, Submenus and MenuItems
         private void GenerateMenu(BaseGraph graph, GameObject target, MaAc modularAvatar, BuildNode descriptor)
         {
-            //Create the Menu
-            GameObject menuObject;
-            (menuObject, _) = MA_Wrapper.createSubMenu(modularAvatar, target, descriptor.name, null);
+            //Check all for null
+            if (descriptor == null) Debug.LogError("Descriptor is null");
+            if (target == null) Debug.LogError("Target is null");
+            if (modularAvatar == null) Debug.LogError("ModularAvatar is null");
+            if (descriptor == null) Debug.LogError("Descriptor is null");
 
             //get the Connected Nodes using the GetConnectedNodes Function
-            var connectedNodes = descriptor.GetPort(nameof(BuildNode.link_OUT_Menu), null).GetEdges().Select(e => e.inputNode).ToList();
+            var connectedNodes = descriptor.GetOutputNodes();
             foreach (var node in connectedNodes)
             {
-                IterateNodes(node, modularAvatar, menuObject);
-            } 
-
-            //Iterate all connected Nodes
-            // foreach (var node in connectedNodes)
-            // {
-            //     if (node is ANPUA_Menu)
-            //     {
-            //         ANPUA_Menu menu = node as ANPUA_Menu;
-            //         GenerateMenu(graph, menuObject, modularAvatar, menu);
-            //     }
-            // }
-
-
-            // //Create the MenuItems
-            // foreach (var node in connectedNodes)
-            // {
-            //     if (node is ANPUA_MenuItem)
-            //     {
-            //         ANPUA_MenuItem menuItem = node as ANPUA_MenuItem;
-            //         GameObject menuItemObject = createSubMenuWithIconOn(modularAvatar, menuObject, menuItem.name, null);
-            //         GenerateMenu(graph, menuItemObject, modularAvatar, menuItem);
-            //     }
-            // }
-
-
+                if (node is MenuBaseNode)
+                {
+                    MenuBaseNode menuNode = node as MenuBaseNode;
+                    EvaluateMenuNode(menuNode, descriptor.menuContainer);
+                }
+            }
         }
 
-        //Function to iterate a Nodes nodes Connected Nodes (Recursive)
-        private void IterateNodes(BaseNode node, MaAc modularAvatar, GameObject menuObject)
+   
+        private void EvaluateMenuNode(MenuBaseNode menuNode, MaItemContainer menuContainer)
         {
-            // get the link_OUT port
-            if (node is MenuNode)
+            if (menuNode == null) return;
+
+            menuNode.ProcessOnBuild();
+            menuContainer = menuNode.ProcessMenuOnBuild(menuContainer, paramtermanager);
+
+            var connectedNodes = menuNode.GetOutputNodes();
+            foreach (MenuBaseNode node in connectedNodes)
             {
-                MenuNode menu = node as MenuNode;
-                //menuObject = createSubMenu(modularAvatar, menuObject, menu.name, null);
-                IterateNodes(menu.GetPort(nameof(MenuNode.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                EvaluateMenuNode(node, menuContainer);
+                //Debug the Containers object name
+                Debug.Log("Container Object Name: " + menuContainer.menuObject.name);
             }
-            else if (node is MenuNode_Toggle)
-            {
-                MenuNode_Toggle toggle = node as MenuNode_Toggle;
-                //get the Input port link_IN_Parameter
-                var parameter = toggle.GetPort(nameof(MenuNode_Toggle.link_IN_Parameter), null).GetEdges().Select(e => e.inputNode).FirstOrDefault();
-                if (parameter == null) return;
-                //get the name of the parameter Node
-                var parameterName = parameter.name;
-              
-                //createToggle(modularAvatar, menuObject, toggle.togglename, FindParameter(parametercache,parameterName).aacParameter as AacFlIntParameter, 0, toggle.icon);
-                IterateNodes(toggle.GetPort(nameof(MenuNode_Toggle.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
-            }
-            var link_OUT = node.GetPort(nameof(MenuNode.link_Menu_OUT), null);
         }
 
+        /* private void IterateNodes(BaseNode node, MaAc modularAvatar, GameObject menuObject)
+                {
+                    // get the link_OUT port
+                    if (node is MenuNode)
+                    {
+                        MenuNode menu = node as MenuNode;
+                        //menuObject = createSubMenu(modularAvatar, menuObject, menu.name, null);
+                        IterateNodes(menu.GetPort(nameof(MenuNode.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                    }
+                    else if (node is MenuNode_Toggle)
+                    {
+                        MenuNode_Toggle toggle = node as MenuNode_Toggle;
+                        //get the Input port link_IN_Parameter
+                        var parameter = toggle.GetPort(nameof(MenuNode_Toggle.link_IN_Parameter), null).GetEdges().Select(e => e.inputNode).FirstOrDefault();
+                        if (parameter == null) return;
+                        //get the name of the parameter Node
+                        var parameterName = parameter.name;
+
+                        //createToggle(modularAvatar, menuObject, toggle.togglename, FindParameter(parametercache,parameterName).aacParameter as AacFlIntParameter, 0, toggle.icon);
+                        IterateNodes(toggle.GetPort(nameof(MenuNode_Toggle.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                    }
+                    var link_OUT = node.GetPort(nameof(MenuNode.link_Menu_OUT), null);
+                }
+
+        */
 
         //Find the Descriptor Node in the Graph  in the Nodes and return the first one
-        private ANPUA_Parameter_Node FindDescriptorNode(BaseGraph graph)
+        private BuildNode FindDescriptorNode(BaseGraph graph)
         {
-            return graph.nodes.Find(n => n is ANPUA_Parameter_Node) as ANPUA_Parameter_Node;
+            return graph.nodes.Find(n => n is BuildNode) as BuildNode;
         }
 
         //Function to Generate all Parameters
@@ -224,21 +192,21 @@ namespace GraphProcessor
                     AacFlIntParameter param = layer.IntParameter(p.name);
                     MaacParameter<int> menuparam = modularAvatar.NewParameter(param);
                     SetParameterState(menuparam, p.syncState, p.state);
-                    parametercache.Add(new ANPUA_BuildCache_Parameter(p.name, p.type, p.syncState, p.state, param, menuparam));
+                    parametercache.Add(new ANPUA_BuildCache_Parameter(p.name, p.type, p.syncState, p.state, param,p.IntValue,p.FloatValue, p.BoolValue, menuparam));
                 }
                 else if (p.type == ANPUA_ParameterType.Float)
                 {
                     AacFlFloatParameter param = layer.FloatParameter(p.name);
                     MaacParameter<float> menuparam = modularAvatar.NewParameter(param);
                     SetParameterState(menuparam, p.syncState, p.state);
-                    parametercache.Add(new ANPUA_BuildCache_Parameter(p.name, p.type, p.syncState, p.state, param, null, menuparam));
+                    parametercache.Add(new ANPUA_BuildCache_Parameter(p.name, p.type, p.syncState, p.state, param,p.IntValue,p.FloatValue, p.BoolValue, null, menuparam));
                 }
                 else if (p.type == ANPUA_ParameterType.Bool)
                 {
                     AacFlBoolParameter param = layer.BoolParameter(p.name);
                     MaacParameter<bool> menuparam = modularAvatar.NewParameter(param);
                     SetParameterState(menuparam, p.syncState, p.state);
-                    parametercache.Add(new ANPUA_BuildCache_Parameter(p.name, p.type, p.syncState, p.state, param, null, null, menuparam));
+                    parametercache.Add(new ANPUA_BuildCache_Parameter(p.name, p.type, p.syncState, p.state, param,p.IntValue,p.FloatValue, p.BoolValue, null, null, menuparam));
                 }
 
             });
@@ -259,20 +227,83 @@ namespace GraphProcessor
             return parametercache;
         }
 
-        //Function to find a Parameter in the List of Parameters
-        private ANPUA_BuildCache_Parameter FindParameter(List<ANPUA_BuildCache_Parameter> parametercache, string name)
-        {
-            return parametercache.FirstOrDefault(p => p.name == name);
-        }
-
-
-
-
-
-
-
 
 
     }
+
+    //Create a class to manage and access  ANPUA_BuildCache_Parameter including the FindParameter Function
+    public class ANPUA_ParameterManager
+    {
+        private List<ANPUA_BuildCache_Parameter> parametercache;
+
+        public ANPUA_ParameterManager(List<ANPUA_BuildCache_Parameter> parametercache)
+        {
+            this.parametercache = parametercache;
+        }
+
+        public ANPUA_BuildCache_Parameter FindParameter(string name)
+        {
+            return parametercache.FirstOrDefault(p => p.name == name);
+        }
+    }
+
+    //Class that can hold a Parameters Name, Type, SyncState and AacFlParameter and MaacParameter
+    public class ANPUA_BuildCache_Parameter
+    {
+        public string name;
+        public ANPUA_ParameterType type;
+        public ANPUA_ParameterSyncState syncState;
+        public ANPUA_ParameterState state;
+        public AacFlParameter aacParameter;
+        public MaacParameter<int> maacParameterInt;
+        public MaacParameter<float> maacParameterFloat;
+        public MaacParameter<bool> maacParameterBool;
+
+        public int intValue=0;
+        public float floatValue=0;
+        public bool boolValue=false;
+
+
+        public ANPUA_BuildCache_Parameter(string name, ANPUA_ParameterType type, ANPUA_ParameterSyncState syncState, ANPUA_ParameterState state, AacFlParameter aacParameter, int intval, float floatval, bool boolval, MaacParameter<int> maacParameterInt = null, MaacParameter<float> maacParameterFloat = null, MaacParameter<bool> maacParameterBool = null)
+        {
+            this.name = name;
+            this.type = type;
+            this.syncState = syncState;
+            this.state = state;
+            this.aacParameter = aacParameter;
+
+            this.intValue = intval;
+            this.floatValue = floatval;
+            this.boolValue = boolval;
+
+            this.maacParameterInt = maacParameterInt;
+            this.maacParameterFloat = maacParameterFloat;
+            this.maacParameterBool = maacParameterBool;
+
+
+        }
+
+        //get the MaacParameter
+        public MaacParameter<T> GetMaacParameter<T>()
+        {
+            if (typeof(T) == typeof(int))
+            {
+                return maacParameterInt as MaacParameter<T>;
+            }
+            else if (typeof(T) == typeof(float))
+            {
+                return maacParameterFloat as MaacParameter<T>;
+            }
+            else if (typeof(T) == typeof(bool))
+            {
+                return maacParameterBool as MaacParameter<T>;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
 }
 #endif

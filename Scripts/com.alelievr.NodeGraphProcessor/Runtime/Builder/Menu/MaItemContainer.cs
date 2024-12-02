@@ -15,19 +15,23 @@ using UnityEngine.UI;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
-public class MaItemContainer : MonoBehaviour
+
+namespace GraphProcessor
 {
-   public ModularAvatarMenuItem menuItem;
-   public GameObject menuObject;
 
-   public MaAc maS;
-
-   //constructor
-    public MaItemContainer( MaAc maS,  GameObject menuObject, ModularAvatarMenuItem menuItem)
+    public class MaItemContainer
     {
-        this.menuItem = menuItem;
-        this.menuObject = menuObject;
-        this.maS = maS;
-    }
+        public ModularAvatarMenuItem menuItem;
+        public GameObject menuObject;
+        public MaAc maS;
 
+        //constructor
+        public MaItemContainer(MaAc maS, GameObject menuObject, ModularAvatarMenuItem menuItem)
+        {
+            this.menuItem = menuItem;
+            this.menuObject = menuObject;
+            this.maS = maS;
+        }
+
+    }
 }

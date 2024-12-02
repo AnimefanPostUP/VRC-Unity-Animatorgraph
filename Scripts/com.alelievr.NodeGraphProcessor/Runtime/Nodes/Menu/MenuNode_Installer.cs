@@ -20,7 +20,7 @@ using MA_Wrapper = GraphProcessor.MaWrapper;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Installer")]
-    public class MenuNode_Installer : MenuBaseNode, Animator_INode
+    public class MenuNode_Installer : MenuBaseNode
     {
         public override string name => "Menu Installer";
 
@@ -32,33 +32,21 @@ namespace GraphProcessor
         //[Input(name = "Icon", allowMultiple = false), SerializeField]
         public VRCExpressionsMenu targetmenu;
 
-        public void InitializedInstallerNode(MaAc maS, VRCExpressionsMenu targetmenu, GameObject targetobject)
-        {
-            ModularAvatarMenuInstaller menuinstaller = MA_Wrapper.createMenuInstaller(targetobject, targetmenu);
-            menuContainer = new MaItemContainer(maS, targetobject, null);
+
+        public override MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterManager)
+        {     
+            Debug.Log("AnimatorGraph: ...Creating Installer");
+            //ModularAvatarMenuInstaller menuinstaller = MA_Wrapper.createMenuInstaller(menuContainer.menuObject); //needs targetMenuImplementation!!!
+            //menuContainer = new MaItemContainer(menuContainer.maS, menuContainer.menuObject, null);
+            return menuContainer;
+       
         }
 
-        public override void ProcessOnBuild()
-        {
-            MenuBaseNode inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as MenuBaseNode; 
-            MaItemContainer inputMenuContainer = inputnode.menuContainer;
 
-            GameObject newMenuObject;
-            ModularAvatarMenuItem newMenuItem;
-
-            (newMenuObject, newMenuItem) = MA_Wrapper.createSubMenu(inputMenuContainer.maS, inputMenuContainer.menuObject, menuname, icon);
-            menuContainer = new MaItemContainer(inputMenuContainer.maS, newMenuObject, newMenuItem);
-        }
-
-        public IEnumerable<ConditionalNode> GetExecutedNodes()
-        {
-            // Return all the nodes connected to the executes port
-            return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
-        }
         public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
         {
             return node.GetOutputNodes();
         }
-  
+
     }
 }

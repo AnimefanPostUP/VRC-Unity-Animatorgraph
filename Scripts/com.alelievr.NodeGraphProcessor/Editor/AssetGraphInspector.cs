@@ -17,6 +17,9 @@ namespace GraphProcessor
 
             myTarget.graphData = (BaseGraph)EditorGUILayout.ObjectField("Graph Data", myTarget.graphData, typeof(BaseGraph), false);
 
+            //gameobject field called menutarget
+            myTarget.assetTarget = (GameObject)EditorGUILayout.ObjectField("assetTarget", myTarget.assetTarget, typeof(GameObject), true);
+
             //Button to Add a new BaseGraph
             if (GUILayout.Button("Add BaseGraph"))
             {

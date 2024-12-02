@@ -3,7 +3,10 @@ using System.Linq;
 using System.Reflection;
 using GraphProcessor;
 using UnityEngine;
-
+using AnimatorAsCode.V1;
+using AnimatorAsCode.V1.ModularAvatar;
+using AnimatorAsCode.V1.VRC;
+using nadena.dev.modular_avatar.core;
 
 namespace GraphProcessor
 {
@@ -21,19 +24,33 @@ namespace GraphProcessor
 		[Output(name = "Menu Installer", allowMultiple = true)]
 		public ANPUA_NodeLink_Menu link_OUT_Menu;
 
-		
+		//For Menu Building
+		[HideInInspector]
+		public MaItemContainer menuContainer;
 
 		public override string name => "Start Build Node";
 
 		public IEnumerable<ConditionalNode> GetExecutedNodes()
 		{
 			// Return all the nodes connected to the executes port
-			return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
+			return null;
 		}
-        public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
-        {
-            return node.GetOutputNodes();
-        }
+		public IEnumerable<BaseNode> GetConnectedNodes(BaseNode node)
+		{
+			return node.GetOutputNodes();
+		}
+
+		public MaItemContainer InitializeMenuContainer(MaAc menuItem, GameObject menuObject)
+		{
+			menuContainer = new MaItemContainer(menuItem, menuObject, null);
+			return menuContainer;
+
+		}
+
+		public List<MenuBaseNode> GetOutputNodes()
+		{
+			return GetPort(nameof(link_OUT_Menu), null).GetEdges().Select(e => e.inputNode as MenuBaseNode).ToList();
+		}
 		public override FieldInfo[] GetNodeFields() => base.GetNodeFields();
 	}
 }

@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using GraphProcessor;
 using UnityEngine;
 using MA_Wrapper = GraphProcessor.MaWrapper;
+using AnimatorAsCode.V1.ModularAvatar;
 
 namespace GraphProcessor
 {
@@ -15,10 +16,10 @@ namespace GraphProcessor
         public override string name => "Menu Radial";
 
 
-        public override void ProcessOnBuild()
+        public override MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterManager)
         {
-            //to be coded
-
+            menuContainer = menuContainer;
+            return menuContainer;
         }
 
         //Float value
@@ -29,7 +30,7 @@ namespace GraphProcessor
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
             // Return all the nodes connected to the executes port
-            return GetOutputNodes().Where(n => n is ConditionalNode).Select(n => n as ConditionalNode);
+            return null;
         }
 
         public override FieldInfo[] GetNodeFields() => base.GetNodeFields();
