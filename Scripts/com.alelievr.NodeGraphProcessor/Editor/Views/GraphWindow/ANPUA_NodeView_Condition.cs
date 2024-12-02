@@ -22,6 +22,8 @@ public class ANPUA_NodeView_Condition : BaseNodeView
         public ANPUA_ParameterListVisualElement(BaseNode node)
         {
             this.condition = (ANPUA_Condition)node;
+            style.flexGrow = 1;
+            reloadFields();
         }
 
 
@@ -39,9 +41,11 @@ public class ANPUA_NodeView_Condition : BaseNodeView
             Clear();
             // Create a MultiColumnListView
             multiColumnListView = new MultiColumnListView();
-            //multiColumnListView.style.flexGrow = 2;
-            //multiColumnListView.selectionType = SelectionType.None;
-            //multiColumnListView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
+            multiColumnListView.style.flexGrow = 2;
+            multiColumnListView.selectionType = SelectionType.None;
+            multiColumnListView.virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight;
+            //Set height to 100%
+            multiColumnListView.style.height = 110;
             // Add the MultiColumnListView to the content container
             Add(multiColumnListView);
         }
@@ -217,55 +221,6 @@ public class ANPUA_NodeView_Condition : BaseNodeView
             multiColumnListView.itemsSource = condition.conditionContainer;
         }
 
-
-        public void Inititalize()
-        {
-            reloadFields();
-
-            // //Create HorizontalContainer
-            // var conditionContainer = new VisualElement();   //conditionContainer.AddToClassList("horizontal-layout");
-            // conditionContainer.style.flexDirection = FlexDirection.Row;
-            // conditionContainer.style.flexWrap = Wrap.NoWrap;
-            // controlsContainer.Add(conditionContainer);
-
-            // ANPUA_GenericParameter parameter = condition.conditionContainer.parameter;
-            // string parametername = "None";
-
-            // if (parameter != null)
-            // {
-            //     parametername = parameter.name;
-            // }
-
-            //PARAMETER
-            // paramterField = new TextField();
-            // conditionContainer.Add(paramterField);
-            // paramterField.value = parametername;
-            // paramterField.RegisterValueChangedCallback(evt =>
-            // {
-            //     condition.conditionContainer.parameterName = evt.newValue;
-            //     //UpdateFields();
-            // });
-
-            //ParameterButton
-            // parameterButton = new Button(OpenParameterMenu) { text = "Select" };
-            // conditionContainer.Add(parameterButton);
-
-            // //COMPAREMODE
-            // selection_CompareMode = new EnumField("", condition.conditionContainer.compareMode);
-            // selection_CompareMode.RegisterValueChangedCallback(evt => { condition.conditionContainer.compareMode = (CompareEnum)evt.newValue; });
-            // conditionContainer.Add(selection_CompareMode);
-
-            // //VARIABLE
-            // variableField = new TextField();
-            // variableField.value = condition.conditionContainer.GetValue().ToString();
-            // variableField.RegisterValueChangedCallback(evt => { condition.conditionContainer.SetValue(evt.newValue); });
-            // conditionContainer.Add(variableField);
-
-
-
-
-        }
-
         public List<CompareEnum> getEnumList(ANPUA_ParameterType parameterType)
         {
             List<CompareEnum> options = new List<CompareEnum>();
@@ -396,14 +351,14 @@ public class ANPUA_NodeView_Condition : BaseNodeView
         ANPUA_ConditionContainer[] conditionContainers = condition.conditionContainer;
 
         //BRANCH MODE
-        selection_BranchMode = new EnumField("",condition.onFalse); 
+        selection_BranchMode = new EnumField("", condition.onFalse);
         //Add tooltip
-        selection_BranchMode.tooltip = 
+        selection_BranchMode.tooltip =
         "When Condition isnt met=> \n" +
         "Nothing: -- \n" +
-        "Return: will Return to this State from the State that this Branch Leads to \n"+
+        "Return: will Return to this State from the State that this Branch Leads to \n" +
         "AnyReturn: will Return to this State, from all States after this one (Excluding Jumps)=> \n";
-    
+
         selection_BranchMode.RegisterValueChangedCallback(evt => { condition.onFalse = (BranchMode)evt.newValue; });
         rightTitleContainer.Add(selection_BranchMode);
         //Make selection_BranchMode 100 wide
@@ -415,7 +370,7 @@ public class ANPUA_NodeView_Condition : BaseNodeView
 
         //Create a ANPUA_NodeView_Condition
         parameterListVisualElement = new ANPUA_ParameterListVisualElement(nodeTarget);
-        parameterListVisualElement.Inititalize();
+        parameterListVisualElement.reloadFields();
         controlsContainer.Add(parameterListVisualElement);
 
         //Button to add container and one to remove, both reload the fields
@@ -443,47 +398,6 @@ public class ANPUA_NodeView_Condition : BaseNodeView
         // bottomPortContainer.Add(new Label("bottomPortContainer"));
         //inputContainerElement.Add(new Label("inputContainerElement"));
     }
-
-
-
-    //Reload Fields On Change method
-    /*
-    public void UpdateFields()
-    {
-        ANPUA_Condition condition = (ANPUA_Condition)nodeTarget;
-        ANPUA_GenericParameter parameter = condition.conditionContainer.parameter;
-
-        //Setting Button Text
-        string parameterName = condition.conditionContainer.GetParameterName();
-
-        // //BRANCH MODE
-        // EnumField enumField = controlsContainer.Query<EnumField>();
-        // enumField.SetValueWithoutNotify(condition.onFalse);
-
-        //COMPAREMODE
-        // EnumField enumField2 = controlsContainer.Query<EnumField>(1);
-        // enumField2.SetValueWithoutNotify(condition.conditionContainer.compareMode);
-
-        //PARAMETER
-        TextField paramterField = controlsContainer.Query<TextField>();
-        paramterField.SetValueWithoutNotify(parameterName);
-
-        //VARIABLE
-        variableField.SetValueWithoutNotify(condition.conditionContainer.GetValue().ToString());
-
-        //PARAMTERBUTTON
-        if (parameterName == "") parameterName = "Select";
-        parameterButton.name = parameterName;
-
-        //Hide Button or Label ?
-        paramterField.style.display = parameter == null ? DisplayStyle.None : DisplayStyle.Flex;
-        parameterButton.style.display = parameter == null ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-*/
-
-
-
-
 
 
 }
