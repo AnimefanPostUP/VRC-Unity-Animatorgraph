@@ -179,25 +179,25 @@ namespace GraphProcessor
         private void IterateNodes(BaseNode node, MaAc modularAvatar, GameObject menuObject)
         {
             // get the link_OUT port
-            if (node is ANPUA_Menu)
+            if (node is MenuNode)
             {
-                ANPUA_Menu menu = node as ANPUA_Menu;
+                MenuNode menu = node as MenuNode;
                 //menuObject = createSubMenu(modularAvatar, menuObject, menu.name, null);
-                IterateNodes(menu.GetPort(nameof(ANPUA_Menu.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                IterateNodes(menu.GetPort(nameof(MenuNode.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
             }
-            else if (node is ANPUA_Menu_Toggle)
+            else if (node is MenuNode_Toggle)
             {
-                ANPUA_Menu_Toggle toggle = node as ANPUA_Menu_Toggle;
+                MenuNode_Toggle toggle = node as MenuNode_Toggle;
                 //get the Input port link_IN_Parameter
-                var parameter = toggle.GetPort(nameof(ANPUA_Menu_Toggle.link_IN_Parameter), null).GetEdges().Select(e => e.inputNode).FirstOrDefault();
+                var parameter = toggle.GetPort(nameof(MenuNode_Toggle.link_IN_Parameter), null).GetEdges().Select(e => e.inputNode).FirstOrDefault();
                 if (parameter == null) return;
                 //get the name of the parameter Node
                 var parameterName = parameter.name;
               
                 //createToggle(modularAvatar, menuObject, toggle.togglename, FindParameter(parametercache,parameterName).aacParameter as AacFlIntParameter, 0, toggle.icon);
-                IterateNodes(toggle.GetPort(nameof(ANPUA_Menu_Toggle.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
+                IterateNodes(toggle.GetPort(nameof(MenuNode_Toggle.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
             }
-            var link_OUT = node.GetPort(nameof(ANPUA_Menu.link_Menu_OUT), null);
+            var link_OUT = node.GetPort(nameof(MenuNode.link_Menu_OUT), null);
         }
 
 

@@ -10,7 +10,7 @@ using MA_Wrapper = GraphProcessor.MaWrapper;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Radial")]
-    public class ANPUA_Menu_Radial : MenuBaseNode, Animator_INode
+    public class MenuNode_Radial : MenuBaseNode, Animator_INode
     {
         public override string name => "Menu Radial";
 

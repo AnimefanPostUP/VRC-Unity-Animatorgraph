@@ -11,7 +11,7 @@ using nadena.dev.modular_avatar.core;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Menu")]
-    public class ANPUA_Menu : MenuBaseNode, Animator_INode
+    public class MenuNode : MenuBaseNode, Animator_INode
     {
         public override string name => "Menu";
 

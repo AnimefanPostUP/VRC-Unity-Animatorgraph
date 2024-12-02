@@ -11,7 +11,7 @@ using nadena.dev.modular_avatar.core;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Toggle")]
-    public class ANPUA_Menu_Toggle : MenuBaseNode, Animator_INode
+    public class MenuNode_Toggle : MenuBaseNode, Animator_INode
     {
         public override string name => "Menu Toggle";
 

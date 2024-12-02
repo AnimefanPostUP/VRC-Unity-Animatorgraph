@@ -20,7 +20,7 @@ using MA_Wrapper = GraphProcessor.MaWrapper;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Installer")]
-    public class ANPUA_Menu_Installer : MenuBaseNode, Animator_INode
+    public class MenuNode_Installer : MenuBaseNode, Animator_INode
     {
         public override string name => "Menu Installer";
 
