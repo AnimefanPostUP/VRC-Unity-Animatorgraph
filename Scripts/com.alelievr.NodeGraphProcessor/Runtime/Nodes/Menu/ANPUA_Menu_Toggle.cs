@@ -5,13 +5,13 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using GraphProcessor;
 using UnityEngine;
-using MA_Wrapper = GraphProcessor.ANPUA_ModularAvatar_Wrapper;
+using MA_Wrapper = GraphProcessor.MaWrapper;
 using nadena.dev.modular_avatar.core;
 
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Toggle")]
-    public class ANPUA_Menu_Toggle : ANPUA_BaseNode_Menu, ANPUA_INode
+    public class ANPUA_Menu_Toggle : MenuBaseNode, Animator_INode
     {
         public override string name => "Menu Toggle";
 
@@ -33,7 +33,7 @@ namespace GraphProcessor
 
         public override void ProcessOnBuild()
         {
-            ANPUA_BaseNode_Menu inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as ANPUA_BaseNode_Menu;
+            MenuBaseNode inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as MenuBaseNode;
             menuContainer = inputnode.menuContainer;
         }
 

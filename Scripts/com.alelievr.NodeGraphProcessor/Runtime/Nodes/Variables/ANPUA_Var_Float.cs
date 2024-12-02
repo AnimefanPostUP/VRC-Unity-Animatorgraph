@@ -8,7 +8,7 @@ using GraphProcessor;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Variables/Float")]
-    public class ANPUA_Var_Float : BaseNode, ANPUA_INode
+    public class ANPUA_Var_Float : BaseNode, Animator_INode
     {
         public override string name => "Variable";
 

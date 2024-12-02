@@ -9,7 +9,7 @@ using UnityEngine;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Logic/Invert")]
-    public class ANPUA_Condition_Invert : BaseNode, ANPUA_INode
+    public class ANPUA_Condition_Invert : BaseNode, Animator_INode
     {
         public override string name => "Invert";
         public override Color color =>  new Color(0.2f, 0.3f, 0.5f);

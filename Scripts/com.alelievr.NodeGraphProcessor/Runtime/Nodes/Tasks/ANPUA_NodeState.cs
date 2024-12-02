@@ -12,7 +12,7 @@ using UnityEngine;
 namespace GraphProcessor
 {
 	[System.Serializable, NodeMenuItem("Basic/State")]
-	public class ANPUA_NodeState : ANPUA_BaseNode_State, ANPUA_INode
+	public class ANPUA_NodeState : StateBaseNode, Animator_INode
 	{
 
 		public override string name => "State";

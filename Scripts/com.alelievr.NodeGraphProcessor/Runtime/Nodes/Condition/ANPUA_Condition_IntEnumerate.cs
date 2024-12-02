@@ -9,7 +9,7 @@ using UnityEngine;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Logic/Int Enumerate")]
-    public class ANPUA_Condition_IntEnumerate : BaseNode, ANPUA_INode
+    public class ANPUA_Condition_IntEnumerate : BaseNode, Animator_INode
     {
         public override string name => "Enumerate";
         public override Color color =>  new Color(0.2f, 0.3f, 0.5f);

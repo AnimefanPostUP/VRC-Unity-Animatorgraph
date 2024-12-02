@@ -174,9 +174,9 @@ namespace GraphProcessor
 			bool exposedParamsVisible = graphView.GetPinnedElementStatus< ExposedParameterView >() != Status.Hidden;
 			showExternParameters = AddToggle("Inputs", exposedParamsVisible, (v) => graphView.ToggleView< ExposedParameterView>());
 
-			showParameters = AddButton("Parameters", () => graphView.ToggleView<ANPUA_ParametersView >());
+			showParameters = AddButton("Parameters", () => graphView.ToggleView<ParameterWindowView >());
 
-			showNodepanel = AddButton("Node Panel", () => graphView.ToggleView<ANPUA_NodePanelView >());
+			showNodepanel = AddButton("Node Panel", () => graphView.ToggleView<NodePanelView >());
 
 			AddButton("Show In Project", () => EditorGUIUtility.PingObject(graphView.graph), false);
 		}

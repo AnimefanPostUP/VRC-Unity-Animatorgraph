@@ -13,14 +13,14 @@ namespace GraphProcessor
 
     using UnityEngine.UIElements;
 
-    public class ANPUA_GenericParameterFieldView : BlackboardField
+    public class GenericParamerterFieldView : BlackboardField
     {
         protected BaseGraphView graphView;
 
         public ANPUA_GenericParameter parameter { get; private set; }
 
         private Type nodeType;
-        public ANPUA_GenericParameterFieldView()
+        public GenericParamerterFieldView()
             //: base(null, param.name, param.type.ToString())
             : base()
         {
@@ -250,7 +250,7 @@ namespace GraphProcessor
     }
 
 
-    public class ANPUA_ParametersView : PinnedElementView
+    public class ParameterWindowView : PinnedElementView
     {
         protected BaseGraphView graphView;
 
@@ -262,7 +262,7 @@ namespace GraphProcessor
 
         private MultiColumnListView multiColumnListView;
 
-        public ANPUA_ParametersView()
+        public ParameterWindowView()
         {
             var style = Resources.Load<StyleSheet>(exposedParameterViewStyle);
             if (style != null)
@@ -356,10 +356,10 @@ namespace GraphProcessor
             multiColumnListView.columns.Add(new Column
             {
                 title = "Name",
-                makeCell = () => new ANPUA_GenericParameterFieldView(),
+                makeCell = () => new GenericParamerterFieldView(),
                 bindCell = (element, i) =>
                 {
-                    var parameterField = element as ANPUA_GenericParameterFieldView;
+                    var parameterField = element as GenericParamerterFieldView;
                     var parameter = graphView.graph.parameters[i] as ANPUA_GenericParameter;
                     parameterField.initialize(graphView, parameter);
                 },
@@ -590,7 +590,7 @@ namespace GraphProcessor
 
         void OnViewClosed(DetachFromPanelEvent evt)
         {
-            Undo.undoRedoPerformed -= UpdateParameterList;
+            Undo.undoRedoPerformed -= UpdateParameterList; 
         }
 
 

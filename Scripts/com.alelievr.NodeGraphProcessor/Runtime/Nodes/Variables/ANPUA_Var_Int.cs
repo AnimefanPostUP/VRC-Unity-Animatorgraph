@@ -8,7 +8,7 @@ using GraphProcessor;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Variables/Integer")]
-    public class ANPUA_Var_Int : BaseNode, ANPUA_INode
+    public class ANPUA_Var_Int : BaseNode, Animator_INode
     {
         public override string name => "Variable";
 

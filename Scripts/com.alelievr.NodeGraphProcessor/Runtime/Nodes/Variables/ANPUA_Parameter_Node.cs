@@ -7,7 +7,7 @@ using UnityEngine;
 namespace GraphProcessor
 {
     [System.Serializable]
-    public class ANPUA_Parameter_Node : BaseNode, ANPUA_INode
+    public class ANPUA_Parameter_Node : BaseNode, Animator_INode
     {
         public override string name => parameter != null ? "P: " + parameter.name : "Parameter Int";
         public override Color color => new Color(0.8f, 0.4f, 0.4f);

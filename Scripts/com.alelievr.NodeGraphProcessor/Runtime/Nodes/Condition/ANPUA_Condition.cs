@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using GraphProcessor;
 using UnityEngine;
+using GraphProcessor.Builder;
 
 
 
@@ -20,7 +21,7 @@ namespace GraphProcessor
     }
 
     [System.Serializable, NodeMenuItem("Logic/Branch")]
-    public class ANPUA_Condition : BaseNode, ANPUA_INode
+    public class ANPUA_Condition : BaseNode, Animator_INode
     {
         public override string name => "Branch";
         public override bool isRenamable => true;
@@ -40,7 +41,7 @@ namespace GraphProcessor
         public ANPUA_NodeLink_Task false_OUT;
 
         [SerializeField]
-        public ANPUA_ConditionContainer[] conditionContainer = new ANPUA_ConditionContainer[0];
+        public AnimatorCondition[] conditionContainer = new Builder.AnimatorCondition[0];
 
 
         //[Input(name = "Return on False"), SerializeField]

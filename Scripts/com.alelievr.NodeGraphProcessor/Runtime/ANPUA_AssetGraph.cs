@@ -16,7 +16,7 @@ using UnityEngine.UI;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
-using MA_Wrapper = GraphProcessor.ANPUA_ModularAvatar_Wrapper;
+using MA_Wrapper = GraphProcessor.MaWrapper;
 
 
 [assembly: ExportsPlugin(typeof(ANPUA_AssetGraphProcessor))]
@@ -137,14 +137,14 @@ namespace GraphProcessor
         }
 
         //Recursive Function to Generate the Menu, Submenus and MenuItems
-        private void GenerateMenu(BaseGraph graph, GameObject target, MaAc modularAvatar, ANPUA_StartNode descriptor)
+        private void GenerateMenu(BaseGraph graph, GameObject target, MaAc modularAvatar, BuildNode descriptor)
         {
             //Create the Menu
             GameObject menuObject;
             (menuObject, _) = MA_Wrapper.createSubMenu(modularAvatar, target, descriptor.name, null);
 
             //get the Connected Nodes using the GetConnectedNodes Function
-            var connectedNodes = descriptor.GetPort(nameof(ANPUA_StartNode.link_OUT_Menu), null).GetEdges().Select(e => e.inputNode).ToList();
+            var connectedNodes = descriptor.GetPort(nameof(BuildNode.link_OUT_Menu), null).GetEdges().Select(e => e.inputNode).ToList();
             foreach (var node in connectedNodes)
             {
                 IterateNodes(node, modularAvatar, menuObject);

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Logic/OR")]
-    public class ANPUA_Condition_OR : BaseNode, ANPUA_INode
+    public class ANPUA_Condition_OR : BaseNode, Animator_INode
     {
         public override string name => "OR";
         public override Color color =>  new Color(0.2f, 0.3f, 0.5f);

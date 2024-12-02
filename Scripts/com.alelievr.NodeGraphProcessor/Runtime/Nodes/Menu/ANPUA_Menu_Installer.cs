@@ -15,12 +15,12 @@ using UnityEngine.UI;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDKBase;
-using MA_Wrapper = GraphProcessor.ANPUA_ModularAvatar_Wrapper;
+using MA_Wrapper = GraphProcessor.MaWrapper;
 
 namespace GraphProcessor
 {
     [System.Serializable, NodeMenuItem("Menu Elements/Installer")]
-    public class ANPUA_Menu_Installer : ANPUA_BaseNode_Menu, ANPUA_INode
+    public class ANPUA_Menu_Installer : MenuBaseNode, Animator_INode
     {
         public override string name => "Menu Installer";
 
@@ -35,19 +35,19 @@ namespace GraphProcessor
         public void InitializedInstallerNode(MaAc maS, VRCExpressionsMenu targetmenu, GameObject targetobject)
         {
             ModularAvatarMenuInstaller menuinstaller = MA_Wrapper.createMenuInstaller(targetobject, targetmenu);
-            menuContainer = new ANPUA_Container_Menu(maS, targetobject, null);
+            menuContainer = new MaItemContainer(maS, targetobject, null);
         }
 
         public override void ProcessOnBuild()
         {
-            ANPUA_BaseNode_Menu inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as ANPUA_BaseNode_Menu; 
-            ANPUA_Container_Menu inputMenuContainer = inputnode.menuContainer;
+            MenuBaseNode inputnode = GetPort(nameof(link_Menu_IN), null).GetEdges().First().inputNode as MenuBaseNode; 
+            MaItemContainer inputMenuContainer = inputnode.menuContainer;
 
             GameObject newMenuObject;
             ModularAvatarMenuItem newMenuItem;
 
             (newMenuObject, newMenuItem) = MA_Wrapper.createSubMenu(inputMenuContainer.maS, inputMenuContainer.menuObject, menuname, icon);
-            menuContainer = new ANPUA_Container_Menu(inputMenuContainer.maS, newMenuObject, newMenuItem);
+            menuContainer = new MaItemContainer(inputMenuContainer.maS, newMenuObject, newMenuItem);
         }
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()

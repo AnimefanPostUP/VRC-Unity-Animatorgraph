@@ -2,29 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using GraphProcessor;
 using UnityEngine;
-using MA_Wrapper = GraphProcessor.MaWrapper;
+
 
 namespace GraphProcessor
 {
-    [System.Serializable, NodeMenuItem("Menu Elements/Radial")]
-    public class ANPUA_Menu_Radial : MenuBaseNode, Animator_INode
+    [System.Serializable, NodeMenuItem("Animation/Clip")]
+    public class AnimateClipNode : BaseNode, Animator_INode
     {
-        public override string name => "Menu Radial";
+        [Output(name = "Motiondata", allowMultiple = true)]
+        public ANPUA_NodeLink_Anim_Clip link_OUT;
+
+        [Input(name = "Clip", allowMultiple = false), SerializeField]
+        public AnimationClip clip;
 
 
-        public override void ProcessOnBuild()
-        {
-            //to be coded
-
-        }
-
-        //Float value
-        [Output(name = "Float", allowMultiple = false), SerializeField]
-        public float float_IN;
-
+        public override string name => "Clip";
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
