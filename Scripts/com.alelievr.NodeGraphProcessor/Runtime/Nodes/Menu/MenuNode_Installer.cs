@@ -32,6 +32,7 @@ namespace GraphProcessor
         //[Input(name = "Icon", allowMultiple = false), SerializeField]
         public VRCExpressionsMenu targetmenu;
 
+        //public List<ConditionContainer> objs = new List<ConditionContainer>();
 
         public override MaItemContainer ProcessMenuOnBuild(MaItemContainer menuContainer, ANPUA_ParameterManager parameterManager)
         {

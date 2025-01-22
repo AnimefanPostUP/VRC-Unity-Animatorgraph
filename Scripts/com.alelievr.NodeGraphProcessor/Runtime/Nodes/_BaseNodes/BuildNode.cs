@@ -46,10 +46,13 @@ namespace GraphProcessor
 			return menuContainer;
 
 		}
-
-		public List<MenuBaseNode> GetOutputNodes()
+		public List<MenuBaseNode> GetOutputMenuNodes()
 		{
 			return GetPort(nameof(link_OUT_Menu), null).GetEdges().Select(e => e.inputNode as MenuBaseNode).ToList();
+		}
+		public List<Animator_TaskNode> GetOutputTaskNodes()
+		{
+			return GetPort(nameof(link_OUT), null).GetEdges().Select(e => e.inputNode as Animator_TaskNode).ToList();
 		}
 		public override FieldInfo[] GetNodeFields() => base.GetNodeFields();
 	}

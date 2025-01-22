@@ -21,7 +21,7 @@ namespace GraphProcessor
     }
 
     [System.Serializable, NodeMenuItem("Logic/Branch")]
-    public class ANPUA_Condition : BaseNode, Animator_INode
+    public class ANPUA_Condition : Animator_TaskNode, Animator_INode
     {
         public override string name => "Branch";
         public override bool isRenamable => true;
