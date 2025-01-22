@@ -28,6 +28,9 @@ namespace GraphProcessor
 		[HideInInspector]
 		public MaItemContainer menuContainer;
 
+		[HideInInspector]
+		public TaskContainer taskContainer;
+
 		public override string name => "Start Build Node";
 
 		public IEnumerable<ConditionalNode> GetExecutedNodes()

@@ -28,7 +28,7 @@ namespace GraphProcessor
             GameObject newMenuObject;
             ModularAvatarMenuItem newMenuItem;
 
-           newMenuObject= MA_Wrapper.createSubMenu(menuContainer.maS, menuContainer.menuObject, menuname, icon);
+            newMenuObject= MA_Wrapper.createSubMenu(menuContainer.maS, menuContainer.menuObject, menuname, icon);
             menuContainer=new MaItemContainer( menuContainer.maS, newMenuObject, null);
             return menuContainer;
         }

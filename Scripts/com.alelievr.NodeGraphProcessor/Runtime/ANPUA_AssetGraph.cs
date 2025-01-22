@@ -30,10 +30,8 @@ namespace GraphProcessor
 
     public class ANPUA_AssetGraphProcessor : Plugin<ANPUA_AssetGraphProcessor>
     {
-        public override string QualifiedName =>
-            "dev.hai-vr.docs.animator-as-code.maac-AnimatorGraph";
+        public override string QualifiedName => "dev.hai-vr.docs.animator-as-code.maac-AnimatorGraph";
         public override string DisplayName => "AnimatorGraph";
-
         private const string SystemName = "AnimatorGraphMAAC";
         private const bool UseWriteDefaults = true;
 
@@ -84,6 +82,7 @@ namespace GraphProcessor
 
             //Modular AV for the Sets itself
             // MaAc modularAvatar = MaAc.Create(new GameObject(SystemName) { transform = { parent = ctx.AvatarRootTransform } });
+
             //Modular AV for the Set Menus
             MaAc menuTarget = MaAc.Create(
                 new GameObject(SystemName + "maS")
@@ -114,7 +113,8 @@ namespace GraphProcessor
             //modularAvatar.NewMergeAnimator(ctrl.AnimatorController, VRCAvatarDescriptor.AnimLayerType.FX);
         }
 
-        //
+        //TASK RELATED FUNCTIONS
+        //====================================================================================================
         private void GenerateTask(BaseGraph graph, GameObject target, BuildNode descriptor)
         {
             if (descriptor == null)
@@ -137,59 +137,29 @@ namespace GraphProcessor
                 if (node is ANPUA_NodeState)
                 {
                     ANPUA_NodeState tasknode = node as ANPUA_NodeState;
-                    EvaluateBranchNode(tasknode, descriptor.menuContainer);
+                    EvaluateTaskNode(tasknode, descriptor.taskContainer);
                 }
             }
         }
 
-        //Recursive Function to Generate the Menu, Submenus and MenuItems
-        private void GenerateMenu(
-            BaseGraph graph,
-            GameObject target,
-            MaAc modularAvatar,
-            BuildNode descriptor
-        )
+        //NOTE: NEED TO IMPLEMENT TASK PROCESSING IN ORDER FOR STATES AND TRANSITIONS TO BE GENERATED!
+        private void EvaluateTaskNode(Animator_TaskNode taskNode, TaskContainer taskContainer)
         {
-            //Check all for null
-            if (descriptor == null)
-                Debug.LogError("Descriptor is null");
-            if (target == null)
-                Debug.LogError("Target is null");
-            if (modularAvatar == null)
-                Debug.LogError("ModularAvatar is null");
-            if (descriptor == null)
-                Debug.LogError("Descriptor is null");
 
-            //get the Connected Nodes using the GetConnectedNodes Function
-            var connectedNodes = descriptor.GetOutputMenuNodes();
-            foreach (var node in connectedNodes)
-            {
-                if (node is MenuBaseNode)
-                {
-                    MenuBaseNode menuNode = node as MenuBaseNode;
-                    EvaluateMenuNode(menuNode, descriptor.menuContainer);
-                }
-            }
-        }
+            if( fUtil.nullError(taskNode, "menuNode is null")) return;
 
-        private void EvaluateBranchNode(ANPUA_NodeState menuNode, MaItemContainer menuContainer)
-        {
-            if (menuNode == null)
-                return;
+            taskNode.ProcessOnBuild();
+            taskContainer = taskNode.ProcessTaskOnBuild(taskContainer, paramtermanager);
 
-            //menuNode.ProcessOnBuild();
-            //menuContainer = menuNode.ProcessMenuOnBuild(menuContainer, paramtermanager);
-
-            var connectedNodes = menuNode.GetOutputNodes();
+            var connectedNodes = taskNode.GetOutputNodes();
             foreach (ANPUA_NodeState node in connectedNodes)
             {
-                EvaluateBranchNode(node, menuContainer);
+                EvaluateTaskNode(node, taskContainer);
                 //Debug the Containers object name
-                Debug.Log("Container Object Name: " + menuContainer.menuObject.name);
+                //Debug.Log("Container Object Name: " + taskContainer.menuObject.name);
             }
         }
 
-        
         private void EvaluateConditionNode(ANPUA_Condition menuNode, MaItemContainer menuContainer)
         {
             if (menuNode == null)
@@ -207,6 +177,34 @@ namespace GraphProcessor
             }
         }
 
+        //MENU RELATED FUNCTIONS
+        //====================================================================================================
+
+        //Recursive Function to Generate the Menu, Submenus and MenuItems
+        private void GenerateMenu(
+            BaseGraph graph,
+            GameObject target,
+            MaAc modularAvatar,
+            BuildNode descriptor
+        )
+        {
+            //Check all for null
+            fUtil.nullError(target, "target is null");
+            fUtil.nullError(modularAvatar, "modularAvatar is null");
+            fUtil.nullError(descriptor, "descriptor is null");
+
+            //get the Connected Nodes using the GetConnectedNodes Function
+            var connectedNodes = descriptor.GetOutputMenuNodes();
+            foreach (var node in connectedNodes)
+            {
+                if (node is MenuBaseNode)
+                {
+                    EvaluateMenuNode(node, descriptor.menuContainer);
+                }
+            }
+        }
+
+
         private void EvaluateMenuNode(MenuBaseNode menuNode, MaItemContainer menuContainer)
         {
             if (menuNode == null)
@@ -223,32 +221,6 @@ namespace GraphProcessor
                 Debug.Log("Container Object Name: " + menuContainer.menuObject.name);
             }
         }
-
-        /* private void IterateNodes(BaseNode node, MaAc modularAvatar, GameObject menuObject)
-                {
-                    // get the link_OUT port
-                    if (node is MenuNode)
-                    {
-                        MenuNode menu = node as MenuNode;
-                        //menuObject = createSubMenu(modularAvatar, menuObject, menu.name, null);
-                        IterateNodes(menu.GetPort(nameof(MenuNode.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
-                    }
-                    else if (node is MenuNode_Toggle)
-                    {
-                        MenuNode_Toggle toggle = node as MenuNode_Toggle;
-                        //get the Input port link_IN_Parameter
-                        var parameter = toggle.GetPort(nameof(MenuNode_Toggle.link_IN_Parameter), null).GetEdges().Select(e => e.inputNode).FirstOrDefault();
-                        if (parameter == null) return;
-                        //get the name of the parameter Node
-                        var parameterName = parameter.name;
-
-                        //createToggle(modularAvatar, menuObject, toggle.togglename, FindParameter(parametercache,parameterName).aacParameter as AacFlIntParameter, 0, toggle.icon);
-                        IterateNodes(toggle.GetPort(nameof(MenuNode_Toggle.link_Menu_OUT), null).GetEdges().Select(e => e.inputNode).FirstOrDefault(), modularAvatar, menuObject);
-                    }
-                    var link_OUT = node.GetPort(nameof(MenuNode.link_Menu_OUT), null);
-                }
-
-        */
 
         //Find the Descriptor Node in the Graph  in the Nodes and return the first one
         private BuildNode FindDescriptorNode(BaseGraph graph)

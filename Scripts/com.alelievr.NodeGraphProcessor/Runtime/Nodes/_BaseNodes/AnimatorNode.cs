@@ -20,7 +20,7 @@ using MA_Wrapper = GraphProcessor.MaWrapper;
 namespace GraphProcessor
 {
 	[System.Serializable]
-	public class AnimatorNode : Animator_TaskNode, Animator_INode
+	public class AnimatorNode : BaseNode, Animator_INode
 	{
 
 		//Processing

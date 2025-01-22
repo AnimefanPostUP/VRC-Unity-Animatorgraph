@@ -20,7 +20,7 @@ using MA_Wrapper = GraphProcessor.MaWrapper;
 namespace GraphProcessor
 {
 	[System.Serializable]
-	public class StateBaseNode : AnimatorNode, Animator_INode
+	public class StateBaseNode : Animator_TaskNode, Animator_INode
 	{
 
 		AacFlState state;
