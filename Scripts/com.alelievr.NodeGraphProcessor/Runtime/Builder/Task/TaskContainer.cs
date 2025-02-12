@@ -21,16 +21,27 @@ namespace GraphProcessor
 
     public class TaskContainer
     {
-        public ModularAvatarMenuItem menuItem;
-        public GameObject menuObject;
-        public MaAc maS;
+        public AacFlLayer layer;
+        public AacFlState entryState;
+        public ConditionBundle conditionBundle;
+        public AacFlController controller;
+
+        
 
         //constructor
-        public TaskContainer(MaAc maS, GameObject menuObject, ModularAvatarMenuItem menuItem)
+        public TaskContainer(  AacFlLayer layer, AacFlState entryState, ConditionBundle conditionBundle ,AacFlController controller)
         {
-            this.menuItem = menuItem;
-            this.menuObject = menuObject;
-            this.maS = maS;
+            this.layer = layer;
+            this.entryState = entryState;
+            this.conditionBundle = conditionBundle;
+        }
+
+        //New TaskContainer From an old one but with a new conditionBundle
+        public TaskContainer(TaskContainer oldContainer, ConditionBundle newConditionBundle)
+        {
+            this.layer = oldContainer.layer;
+            this.entryState = oldContainer.entryState;
+            this.conditionBundle = newConditionBundle;
         }
 
     }

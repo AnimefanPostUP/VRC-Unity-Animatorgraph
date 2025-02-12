@@ -131,7 +131,7 @@ namespace GraphProcessor
                 if (node is ANPUA_Condition)
                 {
                     ANPUA_Condition condition = node as ANPUA_Condition;
-                    EvaluateConditionNode(condition, descriptor.menuContainer);
+                    EvaluateTaskNode(condition, descriptor.taskContainer);
                 }
 
                 if (node is ANPUA_NodeState)
@@ -142,7 +142,9 @@ namespace GraphProcessor
             }
         }
 
-        //NOTE: NEED TO IMPLEMENT TASK PROCESSING IN ORDER FOR STATES AND TRANSITIONS TO BE GENERATED!
+        //NOTE: Completly WIP,
+        //Todo: Correct Proper Logic, currently, the Order of when the TaskContainer is renewed, and where the Transitions should be created hasnt been decided yet.
+        //Further Planning and Designing of the Logic is needed.
         private void EvaluateTaskNode(Animator_TaskNode taskNode, TaskContainer taskContainer)
         {
 
@@ -152,30 +154,47 @@ namespace GraphProcessor
             taskContainer = taskNode.ProcessTaskOnBuild(taskContainer, paramtermanager);
 
             var connectedNodes = taskNode.GetOutputNodes();
-            foreach (ANPUA_NodeState node in connectedNodes)
+            foreach (Animator_TaskNode node in connectedNodes)
             {
-                EvaluateTaskNode(node, taskContainer);
+             
                 //Debug the Containers object name
                 //Debug.Log("Container Object Name: " + taskContainer.menuObject.name);
+
+                //When next Node is a Condition, then a Condition Stack needs to be Created, when the Conditions then end in a Task Again, the Container is Emptied,
+                //Meaming each Task gets a Container, on Evaluation the State is Created and set as the Entry State in the TaskContainer
+                
+                if (node is ANPUA_Condition)
+                {
+                    //Generate/Extend ConditionBundle and then Continue
+                    ANPUA_Condition conditionNode= node as ANPUA_Condition;
+                    conditionNode.ProcessTaskOnBuild(taskContainer, paramtermanager);   
+                }
+                else if (node is ANPUA_NodeState)
+                {
+                    ANPUA_NodeState stateNode = node as ANPUA_NodeState;
+                    stateNode.ProcessTaskOnBuild(taskContainer, paramtermanager);        
+                    EvaluateTaskNode(taskNode, new TaskContainer(taskContainer, new ConditionBundle())); 
+                  
+                } 
             }
         }
 
-        private void EvaluateConditionNode(ANPUA_Condition menuNode, MaItemContainer menuContainer)
-        {
-            if (menuNode == null)
-                return;
+        // private void EvaluateConditionNode(ANPUA_Condition conditionNode, TaskContainer taskContainer)
+        // {
+        //     if (conditionNode == null)
+        //         return;
 
-            //menuNode.ProcessOnBuild();
-            //menuContainer = menuNode.ProcessMenuOnBuild(menuContainer, paramtermanager);
+        //     //menuNode.ProcessOnBuild();
+        //     //menuContainer = menuNode.ProcessMenuOnBuild(menuContainer, paramtermanager);
 
-            var connectedNodes = menuNode.GetOutputNodes();
-            foreach (ANPUA_Condition node in connectedNodes)
-            {
-                EvaluateConditionNode(node, menuContainer);
-                //Debug the Containers object name
-                Debug.Log("Container Object Name: " + menuContainer.menuObject.name);
-            }
-        }
+        //     var connectedNodes = conditionNode.GetOutputNodes();
+        //     foreach (ANPUA_Condition node in connectedNodes)
+        //     {
+        //         EvaluateConditionNode(node, taskContainer);
+        //         //Debug the Containers object name
+        //         Debug.Log("Container Object Name: " + taskContainer.menuObject.name);
+        //     }
+        // }
 
         //MENU RELATED FUNCTIONS
         //====================================================================================================

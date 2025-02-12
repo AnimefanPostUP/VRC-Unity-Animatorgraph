@@ -6,8 +6,14 @@ namespace GraphProcessor
 {
     public class Animator_TaskNode : AnimatorNode
     {
-      public virtual TaskContainer ProcessTaskOnBuild(TaskContainer taskContainer, ANPUA_ParameterManager parameterManager) { return null; }
+        public TaskContainer taskContainer;
 
+        public virtual TaskContainer ProcessTaskOnBuild(
+            TaskContainer taskContainer,
+            ANPUA_ParameterManager parameterManager
+        )
+        {
+            return null;
+        }
     }
-
 }

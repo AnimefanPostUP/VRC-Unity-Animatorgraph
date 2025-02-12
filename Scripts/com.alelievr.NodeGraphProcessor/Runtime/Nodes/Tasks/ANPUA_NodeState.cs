@@ -7,6 +7,7 @@ using GraphProcessor.Builder;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using AAC_Wrapper = GraphProcessor.AAcWrapper;
 
 namespace GraphProcessor
 {
@@ -49,6 +50,14 @@ namespace GraphProcessor
         public ANPUA_NodeLink_Parameter multiplier;
 
   
+       public TaskContainer ProcessTaskOnBuild(TaskContainer taskContainer, ANPUA_ParameterManager parameterManager) 
+        {
+           this.taskContainer = taskContainer;
+           this.taskContainer.entryState = AAC_Wrapper.createState(this.name, taskContainer.layer);
+
+            return null;
+        }
+
 
         // [CustomPortBehavior(nameof(speed))]
         // IEnumerable<PortData> GetInputPort(List<SerializableEdge> edges)

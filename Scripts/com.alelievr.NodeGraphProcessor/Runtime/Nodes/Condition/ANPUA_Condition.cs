@@ -8,6 +8,22 @@ using GraphProcessor.Builder;
 
 
 
+using AnimatorAsCode.V1;
+using AnimatorAsCode.V1.ModularAvatar;
+using AnimatorAsCode.V1.VRC;
+
+using nadena.dev.modular_avatar.core;
+using nadena.dev.ndmf;
+using UnityEditor;
+using UnityEditor.Animations;
+using UnityEditor.SearchService;
+
+using UnityEngine.UI;
+using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Avatars.ScriptableObjects;
+using VRC.SDKBase;
+using AAC_Wrapper = GraphProcessor.AAcWrapper;
+
 namespace GraphProcessor
 {
 
@@ -41,7 +57,7 @@ namespace GraphProcessor
         public ANPUA_NodeLink_Task false_OUT;
 
         [SerializeField]
-        public AnimatorCondition[] conditionContainer = new Builder.AnimatorCondition[0];
+        public Builder.AnimatorCondition[] conditionContainer = new Builder.AnimatorCondition[0];
 
 
         //[Input(name = "Return on False"), SerializeField]
@@ -76,6 +92,15 @@ namespace GraphProcessor
         // 		return outputPorts.FirstOrDefault(n => n.fieldName == fieldName)
         // 			.GetEdges().Select(e => e.inputNode as ConditionalNode);
         // 	}
+
+        public TaskContainer ProcessTaskOnBuild(TaskContainer taskContainer, ANPUA_ParameterManager parameterManager) 
+        {
+           this.taskContainer = taskContainer;
+           this.taskContainer.entryState = AAC_Wrapper.createState(this.name, taskContainer.layer);
+
+            return null;
+        }
+
 
         public IEnumerable<ConditionalNode> GetExecutedNodes()
         {
